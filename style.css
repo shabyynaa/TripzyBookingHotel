@@ -660,3 +660,61 @@ h1 {
     .search-container { grid-template-columns: 1fr; margin-top: -40px; }
     .auth-card { padding: 2rem 1.5rem; border-radius: 20px; }
 }}
+
+/* TABLET - iPad */
+@media (max-width: 1024px) {
+    .search-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 24px;
+        margin: -40px auto 40px;
+    }
+    .search-container .btn-gradient {
+        grid-column: 1 / -1;
+        width: 100%;
+        height: 48px;
+    }
+    .hotel-card { flex-direction: column; }
+    .hotel-img-large { width: 100%; height: 240px; }
+    .recom-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .room-selection-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+}
+
+/* MOBILE - HP */
+@media (max-width: 640px) {
+    nav { padding: 1rem 4%; }
+    .logo { font-size: 1.5rem; }
+    #user-info { font-size: 0.7rem; }
+
+    .hero { padding: 4rem 5% 6rem; }
+    .hero h1 { font-size: 2.2rem; letter-spacing: -0.5px; }
+
+    .search-container {
+        grid-template-columns: 1fr;
+        margin: -30px 4% 30px;
+        padding: 20px;
+        border-radius: 4px;
+    }
+
+    .section-title { font-size: 1.5rem; }
+
+    .recom-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+    }
+
+    .hotel-card { flex-direction: column; }
+    .hotel-img-large { width: 100%; height: 200px; }
+    .hotel-details { padding: 20px; }
+
+    .modal-content { padding: 24px 18px; }
+    .room-selection-grid { grid-template-columns: 1fr; }
+
+    .history-card { padding: 16px; }
+    .history-card:hover { transform: none; }
+
+    .auth-card { padding: 2rem 1.5rem; }
+    .auth-card .logo { font-size: 2.2rem; }
+
+    .payment-option:hover { transform: none; }
+}
