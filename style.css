@@ -427,6 +427,24 @@ h1 {
     justify-content: space-between;
 }
 
+/* Taruh di bawah .hotel-details atau sebelum @media */
+.hotel-address {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+}
+
+/* Jika kamu pakai icon, warnanya akan otomatis pink */
+.hotel-address i {
+    color: var(--pink);
+    font-size: 0.85rem;
+}
+
 .badge-luxury {
     background: var(--yellow);
     color: var(--charcoal);
@@ -544,6 +562,19 @@ h1 {
     border-left: 4px solid var(--yellow);
     padding-left: 15px;
     margin-bottom: 30px;
+}
+
+/* Taruh di bawah .modal-hotel-description */
+.modal-hotel-address {
+    font-size: 0.9rem;
+    color: var(--charcoal-mid);
+    margin: 5px;
+    padding-left: 15px;
+    border-left: 3px solid var(--yellow);
+    font-style: italic;
+    display: block;
+    position: relative;
+    clear: both;
 }
 
 .room-selection-grid {

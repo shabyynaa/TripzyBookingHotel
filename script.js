@@ -33,6 +33,57 @@ const hotelNames = {
     "Japan": ["Park Hyatt Tokyo", "Aman Tokyo", "Hoshinoya Kyoto", "The Ritz-Carlton Osaka", "The Peninsula Tokyo", "Mandarin Oriental Tokyo", "Suiran Kyoto", "Conrad Tokyo", "Four Seasons Otemachi", "Ritz-Carlton Kyoto"]
 };
 
+const hotelAddresses = {
+    "Surabaya": {
+        "Vasa Hotel": "Jl. HR Muhammad No. 31, Sukomanunggal",
+        "Hotel Majapahit": "Jl. Tunjungan No. 65, Genteng",
+        "Shangri-La": "Jl. Mayjen Sungkono No. 120, Sawahan",
+        "Westin Surabaya": "Pakuwon Mall, Jl. Puncak Indah Lontar",
+        "JW Marriott": "Jl. Embong Malang No. 85, Tegalsari",
+        "Wyndham Tower": "Jl. Basuki Rahmat No. 67, Genteng",
+        "Bumi Surabaya": "Jl. Jenderal Basuki Rakhmat No. 106",
+        "Oakwood Suites": "Jl. Raya Kertajaya Indah No. 79, Manyar",
+        "DoubleTree": "Jl. Tunjungan No. 12, Genteng",
+        "Four Points by Sheraton Surabaya, Tunjungan Plaza": "Jl. Embong Malang No. 25, Tegalsari"
+    },
+    "Jakarta": {
+        "The Ritz-Carlton": "Mega Kuningan Kav. E1.1, Jakarta Selatan",
+        "Hotel Indonesia Kempinski": "Jl. MH Thamrin No. 1, Menteng",
+        "Raffles Jakarta": "Ciputra World 1, Jl. Prof. Dr. Satrio",
+        "The Langham": "District 8, SCBD Kav. 52-53, Jakarta Selatan",
+        "Park Hyatt": "Jl. Kebon Sirih No. 17-19, Menteng",
+        "Grand Hyatt": "Jl. M.H. Thamrin Kav. 28-30, Gondangdia",
+        "Fairmont": "Jl. Asia Afrika No. 8, Gelora Bung Karno",
+        "The Dharmawangsa": "Jl. Brawijaya Raya No. 26, Kebayoran Baru",
+        "Mandarin Oriental": "Jl. MH Thamrin, PO Box 3392",
+        "Alila SCBD": "SCBD Lot 11, Jl. Jenderal Sudirman"
+    },
+    "Bali": {
+        "The Apurva Kempinski": "Jl. Raya Nusa Dua Selatan, Sawangan",
+        "W Bali Seminyak": "Jl. Petitenget, Kerobokan, Seminyak",
+        "Ayana Resort": "Jl. Karang Mas Sejahtera, Jimbaran",
+        "Alila Villas Uluwatu": "Jl. Belimbing Sari, Tambiyak, Pecatu",
+        "Potato Head Studios": "Jl. Petitenget No. 51B, Seminyak",
+        "Four Seasons Jimbaran": "Jimbaran, Kuta Selatan",
+        "St. Regis Bali": "Kawasan Pariwisata Nusa Dua Lot S6",
+        "The Mulia": "Jl. Raya Nusa Dua Selatan, Kuta Selatan",
+        "Six Senses Uluwatu": "Jl. Goa Lempeh, Uluwatu, Pecatu",
+        "Maya Ubud": "Jl. Raya Gunung Sari Peliatan, Ubud"
+    },
+    "Japan": {
+        "Park Hyatt Tokyo": "3-7-1-2 Nishi Shinjuku, Shinjuku-ku, Tokyo",
+        "Aman Tokyo": "The Otemachi Tower, 1-5-6 Otemachi, Chiyoda-ku",
+        "Hoshinoya Kyoto": "11-2 Arashiyama Genrokuzan-cho, Nishikyo-ku",
+        "The Ritz-Carlton Osaka": "2-5-25 Umeda, Kita-ku, Osaka",
+        "The Peninsula Tokyo": "1-8-1 Yurakucho, Chiyoda-ku, Tokyo",
+        "Mandarin Oriental Tokyo": "2-1-1 Nihonbashi Muromachi, Chuo-ku",
+        "Suiran Kyoto": "12 Susukinobaba-cho, Saga-Tenryuji, Ukyo-ku",
+        "Conrad Tokyo": "1-9-1 Higashi-Shinbashi, Minato-ku",
+        "Four Seasons Otemachi": "1-2-1 Otemachi, Chiyoda-ku, Tokyo",
+        "Ritz-Carlton Kyoto": "Kamogawa Nijo-ohashi Hotori, Nakagyo-ku"
+    }
+};
+
 const descriptions = [
     "Experience the pinnacle of luxury with world-class service and breathtaking views.",
     "A perfect blend of heritage charm and modern elegance in the heart of the city.",
@@ -44,10 +95,10 @@ const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Bu
 
 const reviewTemplates = [
     { user: "Syahri Banun", text: "Absolutely stunning! The service was impeccable." },
-    { user: "Muhammad Aditya Nugraha", text: "The best stay I've ever had. Panoramic views are worth it." },
-    { user: "Chelsea", text: "Fasilitas lengkap dan staf sangat membantu." },
-    { user: "Muhammad Dayyan Ghazanfar Latief", text: "A truly serene experience. Amazing attention to detail." },
-    { user: "Sitti Aminah", text: "Luxury at its finest. The breakfast spread was world-class." }
+    { user: "Muhammad Aditya Nugraha", text: "Keren banget sumpah, pelayanannya gacor parah" },
+    { user: "Chelsea", text: "Ada gym btw, jadi bicep gue tambah gede" },
+    { user: "Muhammad Dayyan Ghazanfar Latief", text: "A truly exceptional experience." },
+    { user: "Sitti Aminah", text: "Luxury banget, emang recommended sih jujur, cuma harganya emang aga mahal" }
 ];
 
 const roomTypes = [
@@ -196,7 +247,11 @@ function renderResults(data) {
     const list = document.getElementById('hotel-list');
     if (data.length === 0) { list.innerHTML = "<h3>No hotels found.</h3>"; return; }
 
-    list.innerHTML = data.map(h => `
+    list.innerHTML = data.map(h => {
+        // Logika variabel ditaruh di sini (sebelum return template)
+        const address = hotelAddresses[h.loc][h.name] || "Address not available";
+        
+        return `
         <div class="hotel-card">
             <img src="${h.thumb}" class="hotel-img-large">
             <div class="hotel-details">
@@ -205,6 +260,10 @@ function renderResults(data) {
                     <div style="display:flex; justify-content:space-between; align-items: flex-start;">
                         <div>
                             <h2 style="font-family:'Poppins',sans-serif; font-size: 1.7rem; font-weight:700;">${h.name}</h2>
+                            <p class="hotel-address" style="font-size: 0.85rem; color: var(--pink); margin-bottom: 5px;">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                ${address}
+                            </p>
                             <p style="color:var(--text-muted); font-size:0.82rem; letter-spacing:1px; text-transform:uppercase;">📍 ${h.loc}</p>
                         </div>
                         <div style="text-align:right;">
@@ -221,13 +280,18 @@ function renderResults(data) {
                     <button class="btn-gradient" onclick="openRoomModal(${h.id})">Select Room</button>
                 </div>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 function openRoomModal(hotelId) {
     const hotel = database.find(h => h.id === hotelId);
     document.getElementById('modal-hotel-name').innerText = hotel.name;
     document.getElementById('modal-hotel-loc').innerText = `Exclusive Stays in ${hotel.loc}`;
+    
+    // INI TAMBAHANNYA: Mengisi alamat hotel ke dalam modal
+    document.getElementById('modal-hotel-address').innerText = hotelAddresses[hotel.loc][hotel.name] || "Address not available";
+    
     document.getElementById('modal-hotel-description').innerText = hotel.description;
     
     document.getElementById('modal-hotel-facilities').innerHTML = hotel.facilities.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('');
