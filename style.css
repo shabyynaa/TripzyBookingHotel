@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
+/*warna warnanya */
 :root {
     --pink: #FF74B1;
     --pink-light: #FFB1D4;
@@ -18,7 +19,7 @@
     --shadow-card: 0 15px 35px rgba(255, 116, 177, 0.15);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --radius: 20px; 
-
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Poppins', sans-serif;
@@ -27,10 +28,10 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
-
+/* hidden itu untuk menyembunyikan elemen yang akan ditampilkan dengan js */
 .hidden { display: none !important; }
 
-/* ── BUTTONS ── */
+/* tombol tombol */
 .btn-gradient {
     background: var(--pink);
     color: var(--white);
@@ -63,8 +64,8 @@ body {
 }
 .btn-outline:hover { background: var(--pink); color: var(--white); transform: scale(1.05); }
 
-/* ── NAVBAR ── */
 
+/* design navigation barnya */
 .floating-nav {
     position: fixed;
     bottom: 30px; 
@@ -123,7 +124,7 @@ nav {
     letter-spacing: 1px;
 }
 
-/* State Aktif saat Navigasi Terpilih */
+/* state aktif kalo navigasinya dipencet */
 .nav-item.active {
     color: var(--yellow); 
 }
@@ -137,7 +138,7 @@ nav {
     color: #000;
 }
 
-/* ── ACCOUNT PAGE SPECIFIC STYLING ── */
+/* account page dan isinya */
 .account-info-list {
     display: flex;
     flex-direction: column;
@@ -165,7 +166,7 @@ nav {
     font-weight: 500;
 }
 
-/* ── UTILITY ── */
+/* dihide isi dari elemen yang akan ditampilkan dengan js */
 .hidden {
     display: none !important;
 }
@@ -174,6 +175,7 @@ main {
     padding-bottom: 120px; 
 }
 
+/* buat backgroundnya jadi transparan biar keliatan bagus */
 #bookings-page, #account-page {
     background: transparent !important;
 }
@@ -185,6 +187,7 @@ h1 {
 
 #main-app { padding-top: 0px; }
 
+/* logo di navbar dan juga di halaman auth */
 .logo {
     font-family: 'Poppins', sans-serif;
     font-size: 1.8rem;
@@ -194,6 +197,7 @@ h1 {
     letter-spacing: -1px;
 }
 
+/* info user di navbar */
 #user-info {
     font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
@@ -204,7 +208,7 @@ h1 {
     border-radius: 50px;
 }
 
-/* ── AUTH PAGE ── */
+/* auth page */
 #auth-page {
     min-height: 100vh;
     display: flex;
@@ -252,11 +256,13 @@ h1 {
     animation: fadeUp 0.8s ease both;
 }
 
+/* animasi di auth card seperti pop up */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* logo di dalam auth card */
 .auth-card .logo {
     font-size: 3rem;
     color: var(--pink);
@@ -264,8 +270,10 @@ h1 {
     display: block;
 }
 
+/* teks kecil di bawah logo */
 .auth-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
 
+/* grup input di dalam auth card */
 .auth-card .input-group { margin-bottom: 14px; text-align: center; }
 .auth-card .input-group label { color: var(--charcoal); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; display: block; }
 .auth-card .input-group input {
@@ -282,11 +290,14 @@ h1 {
 }
 .auth-card .input-group input:focus { border-color: var(--pink); background: var(--white); }
 
+/* tombol submit di auth card */
 .auth-card .btn-gradient { background: var(--pink); color: var(--white); width: 100%; padding: 15px; margin-top: 8px; font-size: 1rem; }
 
+/* toggle untuk switch antara login dan signup */
 .auth-toggle { color: var(--text-muted); font-size: 0.85rem; margin-top: 20px; cursor: pointer; }
 .auth-toggle span { color: var(--pink); font-weight: 700; }
 
+/* bagian signup yang muncul ketika toggle */
 #signup-section input {
     width: 100%;
     padding: 13px 20px;
@@ -302,7 +313,7 @@ h1 {
 }
 #signup-section input:focus { border-color: var(--pink); }
 
-/* ── HERO ── */
+/* bagian hero di home page*/
 .hero {
     background-image: 
         linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 100%),
@@ -336,7 +347,7 @@ h1 {
     opacity: 0.9;
 }
 
-/* ── SEARCH CONTAINER ── */
+/* kotak search */
 .search-container {
     max-width: 1100px;
     margin: -65px auto 60px;
@@ -392,7 +403,7 @@ h1 {
     font-weight: 600;
 }
 
-/* ── HOTEL LIST ── */
+/* list list hotelnya*/
 #hotel-list {
     padding: 2rem 6%;
     max-width: 1200px;
@@ -427,7 +438,6 @@ h1 {
     justify-content: space-between;
 }
 
-/* Taruh di bawah .hotel-details atau sebelum @media */
 .hotel-address {
     font-size: 0.8rem;
     color: var(--text-muted);
@@ -439,7 +449,6 @@ h1 {
     line-height: 1.4;
 }
 
-/* Jika kamu pakai icon, warnanya akan otomatis pink */
 .hotel-address i {
     color: var(--pink);
     font-size: 0.85rem;
@@ -457,7 +466,7 @@ h1 {
     display: inline-block;
 }
 
-/* ── MODAL ── */
+/* modal untuk detail hotel*/
 .modal {
     position: fixed;
     top: 0; left: 0;
@@ -482,7 +491,7 @@ h1 {
     border-top: 8px solid var(--pink);
 }
 
-/* Kontainer Fasilitas di dalam Modal */
+/* kotak kotak kecil untuk fasilitas */
 .modal-hotel-facilities {
     display: flex;
     flex-wrap: wrap;
@@ -490,7 +499,6 @@ h1 {
     margin-top: 5px;
 }
 
-/* Tag fasilitas */
 .facility-tag-detail {
     font-size: 0.75rem;
     background: var(--yellow-light);
@@ -504,7 +512,7 @@ h1 {
     gap: 5px;
 }
 
-/* Kotak Review Item */
+/* kotak untuk review */
 .review-item {
     background: var(--white);
     padding: 18px;
@@ -519,7 +527,6 @@ h1 {
     border-color: var(--pink-light);
 }
 
-/* Nama User di Review */
 .review-user {
     display: block;
     font-weight: 800;
@@ -528,7 +535,6 @@ h1 {
     margin-bottom: 2px;
 }
 
-/* Rating Bintang */
 .review-stars {
     color: var(--yellow);
     font-size: 0.8rem;
@@ -536,7 +542,6 @@ h1 {
     display: block;
 }
 
-/* Teks Review */
 .review-text {
     font-size: 0.85rem;
     color: var(--charcoal-mid);
@@ -544,7 +549,6 @@ h1 {
     font-style: italic;
 }
 
-/* Statistik Review */
 .review-stats {
     display: inline-block;
     background: var(--pink);
@@ -556,7 +560,7 @@ h1 {
     margin-bottom: 15px;
 }
 
-/* Spasi tambahan untuk deskripsi */
+/* kotak untuk deskripsi hotel */
 .modal-hotel-description {
     padding: 10px 5px;
     border-left: 4px solid var(--yellow);
@@ -564,7 +568,6 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* Taruh di bawah .modal-hotel-description */
 .modal-hotel-address {
     font-size: 0.9rem;
     color: var(--charcoal-mid);
@@ -577,12 +580,15 @@ h1 {
     clear: both;
 }
 
+/* grid untuk pilihan kamar yang bisa dipesan */
 .room-selection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
     margin-top: 28px;
 }
+
+/* card untuk masing masing kamar yang bisa dipesan */
 .room-card {
     border: 2px solid var(--yellow-light);
     border-radius: 20px;
@@ -593,6 +599,7 @@ h1 {
 }
 .room-card:hover { border-color: var(--pink); background: var(--yellow-light); transform: translateY(-5px); }
 
+/* tag untuk fasilitas di dalam card pilihan kamar */
 .facility-tag {
     font-size: 0.7rem;
     background: var(--pink-light);
@@ -603,7 +610,7 @@ h1 {
     margin-right: 5px;
 }
 
-/* ── HISTORY CARDS ── */
+/* kotak untuk history cardnya */
 .history-card {
     background: var(--white);
     padding: 22px 26px;
@@ -616,7 +623,7 @@ h1 {
 }
 .history-card:hover { transform: scale(1.02); background: var(--yellow-light); }
 
-/* ── RECOMMENDATION GRID ── */
+/* grid untuk rekomendasi hotel */
 .recom-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -634,7 +641,7 @@ h1 {
 .recom-img { height: 180px; width: 100%; object-fit: cover; }
 .recom-info { padding: 18px; }
 
-/* ── PAYMENT OPTIONS ── */
+/* kotak kotak untuk pilihan metode pembayaran */
 .payment-option {
     border: 2px solid var(--yellow-light);
     padding: 18px 22px;
@@ -645,7 +652,7 @@ h1 {
 }
 .payment-option:hover { border-color: var(--pink); background: var(--pink-light); }
 
-/* ── SECTION HEADERS ── */
+/* header untuk tiap section */
 .section-header {
     margin-bottom: 28px;
 }
@@ -660,7 +667,7 @@ h1 {
     text-transform: none;
 }
 
-/* ── DIVIDER ── */
+/* pemisah antar section */
 .gold-divider {
     width: 60px;
     height: 4px;
@@ -669,7 +676,7 @@ h1 {
     margin: 10px 0 15px;
 }
 
-/* ── RECEIPT ── */
+/* receipt / bukti transaksi*/
 .receipt-row {
     padding: 12px 0;
     font-size: 0.95rem;
@@ -681,7 +688,7 @@ h1 {
     color: var(--pink);
 }
 
-/* ── RESPONSIVE ── */
+/* bisa ditampilkan di laptop */
 @media (max-width: 900px) {
     .search-container { grid-template-columns: 1fr 1fr; border-radius: 20px; }
     .hotel-card { flex-direction: column; border-radius: 20px; }
@@ -692,7 +699,7 @@ h1 {
     .auth-card { padding: 2rem 1.5rem; border-radius: 20px; }
 }}
 
-/* TABLET - iPad */
+/* bisa ditampilkan di tablet*/
 @media (max-width: 1024px) {
     .search-container {
         grid-template-columns: 1fr 1fr;
