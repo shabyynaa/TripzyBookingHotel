@@ -49,8 +49,8 @@
     </section>
 
     <main id="main-app" class="hidden">
+        
         <section id="home-page">
-
             <div class="hero">
                 <h1>Beyond Your <em>Imagination</em></h1>
             </div>
@@ -86,30 +86,46 @@
             </div>
 
             <div style="padding: 0 6% 80px; max-width: 1200px; margin-left: auto; margin-right: auto;">
-
-                <div style="margin-bottom: 30px;">
-                    <div class="section-header">
-                        <div>
-                            <h3 class="section-title">Upcoming Stays</h3>
-                            <div class="gold-divider"></div>
-                        </div>
-                    </div>
-                    <div id="booking-history">
-                        <p style="color: var(--text-light); font-size: 0.88rem; font-style: italic; padding: 10px 0;">Ready for your next adventure?</p>
-                    </div>
-                </div>
-
                 <div>
                     <div class="section-header">
                         <div>
                             <h3 class="section-title">Handpicked for You</h3>
                             <div class="gold-divider"></div>
                         </div>
-                        <span class="section-link" onclick="performSearch()">View All →</span>
                     </div>
                     <div id="recommendations" class="recom-grid"></div>
                 </div>
+            </div>
+        </section>
 
+        <section id="bookings-page" class="hidden" style="padding: 100px 6% 120px;">
+            <div style="max-width: 800px; margin: auto;">
+                <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--white); margin-bottom: 10px;">My Bookings</h2>
+                <p style="color: var(--yellow); margin-bottom: 40px; font-weight: 500;">Manage your upcoming luxury stays.</p>
+                <div id="booking-history">
+                    <p style="color: rgba(255,255,255,0.7); font-style: italic;">No bookings found yet. Start exploring!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="account-page" class="hidden" style="padding: 100px 6% 120px;">
+            <div class="auth-card" style="max-width: 500px; margin: auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                <h2 style="font-size: 1.8rem; font-weight: 800; text-align: center;">Account Profile</h2>
+                <div class="gold-divider" style="margin: 15px auto 30px;"></div>
+                
+                <div class="account-info-list">
+                    <div class="info-item"><strong>Full Name</strong><p id="acc-name">-</p></div>
+                    <div class="info-item"><strong>KTP Number</strong><p id="acc-ktp">-</p></div>
+                    <div class="info-item"><strong>Phone</strong><p id="acc-phone">-</p></div>
+                    <div class="info-item">
+                        <strong>Password</strong>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="password" id="acc-pass" value="********" disabled style="border:none; background:transparent; font-size: 1rem; color: var(--charcoal); flex-grow:1; padding:0;">
+                            <button class="btn-outline" onclick="unlockPassword()" style="padding: 5px 12px; font-size: 0.7rem;">Unlock</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-gradient" onclick="location.reload()" style="width: 100%; margin-top: 30px; padding: 12px;">Sign Out</button>
             </div>
         </section>
 
@@ -119,6 +135,22 @@
             </div>
             <div id="hotel-list"></div>
         </section>
+
+        <nav class="floating-nav">
+            <div class="nav-item active" onclick="showPage('home-page', this)">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="showPage('bookings-page', this)">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <span>Bookings</span>
+            </div>
+            <div class="nav-item" onclick="showPage('account-page', this)">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Account</span>
+            </div>
+        </nav>
+
     </main>
 
     <div id="room-modal" class="modal">
@@ -132,20 +164,17 @@
             </div>
             <p id="modal-hotel-loc" style="color:var(--pink); font-weight:700; font-size:0.8rem; letter-spacing:1px; text-transform:uppercase; margin-bottom: 20px;"></p>
 
-            <div id="modal-hotel-description" style="margin-bottom: 30px; line-height: 1.6; color: var(--charcoal-mid); font-size: 0.95rem;">
-                </div>
+            <div id="modal-hotel-description" style="margin-bottom: 30px; line-height: 1.6; color: var(--charcoal-mid); font-size: 0.95rem;"></div>
 
             <div style="margin-bottom: 30px;">
                 <h4 style="font-size: 1rem; margin-bottom: 12px; font-weight: 700;">Hotel Facilities</h4>
-                <div id="modal-hotel-facilities" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    </div>
+                <div id="modal-hotel-facilities" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
             </div>
 
             <div style="margin-bottom: 40px; background: var(--yellow-light); padding: 25px; border-radius: var(--radius);">
                 <h4 style="font-size: 1rem; margin-bottom: 5px; font-weight: 700;">What Guests Say</h4>
                 <p id="review-stats" style="font-size: 0.75rem; color: var(--pink); font-weight: 600; margin-bottom: 15px;"></p>
-                <div id="modal-hotel-reviews" style="display: flex; flex-direction: column; gap: 15px;">
-                    </div>
+                <div id="modal-hotel-reviews" style="display: flex; flex-direction: column; gap: 15px;"></div>
             </div>
 
             <h4 style="font-size: 1.2rem; margin-bottom: 15px; font-weight: 800; border-bottom: 2px solid var(--yellow-light); padding-bottom: 10px;">Available Rooms</h4>
@@ -173,7 +202,6 @@
                 <div class="input-group" style="margin-bottom: 14px;"><label>Full Name</label><input type="text" id="guest-name"></div>
                 <div id="extra-guest-fields" class="hidden">
                     <div class="input-group" style="margin-bottom: 14px;"><label>ID Number (KTP)</label><input type="text" id="guest-id-num"></div>
-                    <div class="input-group" style="margin-bottom: 14px;"><label>Email Address</label><input type="email" id="guest-email"></div>
                 </div>
                 <div class="input-group" style="margin-bottom: 14px;"><label>Phone Number</label><input type="tel" id="guest-phone"></div>
                 <div class="input-group" style="margin-bottom: 18px;"><label>Special Requests</label><textarea id="guest-requests" rows="2" style="resize:vertical;"></textarea></div>

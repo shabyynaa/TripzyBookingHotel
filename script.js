@@ -17,12 +17,8 @@ const DEV_MODE = false;
 window.onload = function() {
     populateDropdowns();
     if (DEV_MODE) {
-        currentUserObj = { name: "Dev User", phone: "08123456789", ktp: "0000000000" };
-        document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('navbar').classList.remove('hidden');
-        document.getElementById('user-info').innerText = `Hi, Dev User ✦`;
-        renderRecommendations();
+        currentUserObj = { name: "Dev User", phone: "08123456789", ktp: "0000000000", pass: "dev123" };
+        loginSuccessAction(currentUserObj);
     }
 };
 
@@ -37,22 +33,21 @@ const hotelNames = {
     "Japan": ["Park Hyatt Tokyo", "Aman Tokyo", "Hoshinoya Kyoto", "The Ritz-Carlton Osaka", "The Peninsula Tokyo", "Mandarin Oriental Tokyo", "Suiran Kyoto", "Conrad Tokyo", "Four Seasons Otemachi", "Ritz-Carlton Kyoto"]
 };
 
-// --- TAMBAHAN DATA UNTUK DESKRIPSI, FASILITAS, & REVIEWS ---
 const descriptions = [
-    "Experience the pinnacle of luxury with world-class service and breathtaking views. Each corner is designed for your ultimate comfort.",
-    "A perfect blend of heritage charm and modern elegance. This property offers a unique sanctuary in the heart of the city.",
-    "Indulge in an oasis of tranquility featuring award-winning dining and unparalleled hospitality that makes you feel at home.",
-    "An architectural masterpiece offering a refined stay with state-of-the-art amenities and a sophisticated atmosphere."
+    "Experience the pinnacle of luxury with world-class service and breathtaking views.",
+    "A perfect blend of heritage charm and modern elegance in the heart of the city.",
+    "Indulge in an oasis of tranquility featuring award-winning dining.",
+    "An architectural masterpiece offering a refined stay with state-of-the-art amenities."
 ];
 
-const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining", "Fitness Center", "Valet Parking"];
+const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining"];
 
 const reviewTemplates = [
-    { user: "Syahri Banun", text: "Absolutely stunning! The service was impeccable from the moment I arrived." },
-    { user: "Chelsea", text: "The best stay I've ever had. The panoramic view from the suite is worth every penny." },
-    { user: "Fazle Mawla Wahyuhanda", text: "Fasilitasnya sangat lengkap dan stafnya sangat membantu. Sangat direkomendasikan!" },
-    { user: "Jylan Annisa Mumtaza Syidana", text: "A truly serene experience. The attention to detail in the room design is amazing." },
-    { user: "Sitti Aminah", text: "Luxury at its finest. The breakfast spread was world-class." }
+    { user: "Alexander W.", text: "Absolutely stunning! The service was impeccable." },
+    { user: "Sophia L.", text: "The best stay I've ever had. Panoramic views are worth it." },
+    { user: "Budi Santoso", text: "Fasilitas lengkap dan staf sangat membantu." },
+    { user: "Yuki Tanaka", text: "A truly serene experience. Amazing attention to detail." },
+    { user: "Michael G.", text: "Luxury at its finest. The breakfast spread was world-class." }
 ];
 
 const roomTypes = [
@@ -68,22 +63,19 @@ const locationPhotos = {
     "Japan": ["img/ParkHyattJapan.jpg", "img/AmanTokyoJapan.jpg", "img/HoshinoyaKyoto.jpg", "img/TheRitzCarltonOsaka.jpg", "img/ThePeninsulaJapan.jpg", "img/MandarinOrientalTokyo.jpg", "img/SuiranKyotoJapan.webp", "img/ConradTokyoJapan.jpg", "img/FourSeasonOtemachi.webp", "img/RitzCarltonTokyo.jpg"]
 };
 
-// Building the Database
 let idCounter = 1;
 locations.forEach(loc => {
     hotelNames[loc].forEach((name, index) => {
         const rating = (4.5 + Math.random() * 0.5).toFixed(1);
-        const reviewsCount = Math.floor(Math.random() * 8000) + 1000; // Generate total reviews random
- 
         database.push({
             id: idCounter++,
             name: name,
             loc: loc,
             rate: rating,
-            reviews: reviewsCount,
-            description: descriptions[Math.floor(Math.random() * descriptions.length)], // Random desc
-            facilities: [...generalFacilities].sort(() => 0.5 - Math.random()).slice(0, 5), // Random 5 facilities
-            topReviews: reviewTemplates, // Top 5 reviews
+            reviews: Math.floor(Math.random() * 5000) + 200,
+            description: descriptions[Math.floor(Math.random() * descriptions.length)],
+            facilities: [...generalFacilities].sort(() => 0.5 - Math.random()).slice(0, 5),
+            topReviews: reviewTemplates,
             thumb: locationPhotos[loc][index],
             isLuxury: index < 3,
             rooms: roomTypes.map(r => ({
@@ -101,13 +93,8 @@ let pendingBooking = null;
 
 // --- AUTH LOGIC ---
 function toggleAuth(isLogin) {
-    if (isLogin) {
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('signup-section').classList.add('hidden');
-    } else {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('signup-section').classList.remove('hidden');
-    }
+    document.getElementById('login-section').classList.toggle('hidden', !isLogin);
+    document.getElementById('signup-section').classList.toggle('hidden', isLogin);
 }
 
 function signupAction() {
@@ -126,25 +113,61 @@ function signupAction() {
 function loginAction() {
     const userIn = document.getElementById('login-id').value;
     const passIn = document.getElementById('login-pass').value;
-    const foundUser = users.find(u => u.user === userIn && u.pass === passIn) || (userIn === "admin" && passIn === "admin");
+    const foundUser = users.find(u => u.user === userIn && u.pass === passIn) || (userIn === "admin" && passIn === "admin" ? {name: "Admin User", phone: "08123", ktp: "123", pass: "admin"} : null);
 
     if (foundUser) {
-        currentUserObj = foundUser === true ? { name: "Demo User", phone: "0812345", ktp: "12345678" } : foundUser;
-        document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('navbar').classList.remove('hidden');
-        document.getElementById('user-info').innerText = `Hi, ${currentUserObj.name} ✦`;
-        renderRecommendations();
-    } else { alert("Invalid credentials. Try admin/admin for demo."); }
+        loginSuccessAction(foundUser);
+    } else { alert("Invalid credentials."); }
 }
 
-function showPage(pageId) {
-    document.getElementById('home-page').classList.add('hidden');
-    document.getElementById('results-page').classList.add('hidden');
+function loginSuccessAction(user) {
+    currentUserObj = user;
+    document.getElementById('auth-page').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('user-info').innerText = `Hi, ${currentUserObj.name} ✦`;
+    
+    // Fill Account Data
+    document.getElementById('acc-name').innerText = currentUserObj.name;
+    document.getElementById('acc-phone').innerText = currentUserObj.phone;
+    document.getElementById('acc-ktp').innerText = currentUserObj.ktp;
+    document.getElementById('acc-pass').value = "********"; 
+    
+    showPage('home-page');
+    renderRecommendations();
+}
+
+// --- NAVIGATION LOGIC ---
+function showPage(pageId, navEl = null) {
+    // Hide all pages
+    ['home-page', 'bookings-page', 'account-page', 'results-page'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    
+    // Show target page
     document.getElementById(pageId).classList.remove('hidden');
+    
+    // Update Nav UI
+    if (navEl) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        navEl.classList.add('active');
+    }
     window.scrollTo(0, 0);
 }
 
+// --- ACCOUNT LOGIC ---
+function unlockPassword() {
+    const phoneConfirm = prompt("To view password, please enter your Phone Number:");
+    if (phoneConfirm === currentUserObj.phone) {
+        document.getElementById('acc-pass').value = currentUserObj.pass;
+        document.getElementById('acc-pass').type = "text";
+        alert("Password Unlocked.");
+    } else {
+        alert("Phone number does not match.");
+    }
+}
+
+// --- CORE APP LOGIC ---
 function renderRecommendations() {
     const container = document.getElementById('recommendations');
     const luxuryOnes = database.filter(h => h.isLuxury).sort(() => 0.5 - Math.random()).slice(0, 4);
@@ -171,7 +194,7 @@ function performSearch() {
 
 function renderResults(data) {
     const list = document.getElementById('hotel-list');
-    if (data.length === 0) { list.innerHTML = "<h3>No hotels found in this area.</h3>"; return; }
+    if (data.length === 0) { list.innerHTML = "<h3>No hotels found.</h3>"; return; }
 
     list.innerHTML = data.map(h => `
         <div class="hotel-card">
@@ -181,70 +204,54 @@ function renderResults(data) {
                     ${h.isLuxury ? '<span class="badge-luxury"> Luxury Collection</span>' : ''}
                     <div style="display:flex; justify-content:space-between; align-items: flex-start;">
                         <div>
-                            <h2 style="font-family:'Cormorant Garamond',serif; font-size: 1.7rem; font-weight:400; letter-spacing:-0.5px; margin-bottom:6px;">${h.name}</h2>
+                            <h2 style="font-family:'Poppins',sans-serif; font-size: 1.7rem; font-weight:700;">${h.name}</h2>
                             <p style="color:var(--text-muted); font-size:0.82rem; letter-spacing:1px; text-transform:uppercase;">📍 ${h.loc}</p>
                         </div>
-                        <div style="text-align:right; flex-shrink:0; margin-left:16px;">
-                            <div style="color:var(--gold-dark); font-weight:600; font-size:1rem;">⭐ ${h.rate}</div>
-                            <small style="color:var(--text-light); font-size:0.75rem;">${h.reviews} Reviews</small>
+                        <div style="text-align:right;">
+                            <div style="color:var(--gold-dark); font-weight:600;">⭐ ${h.rate}</div>
+                            <small>${h.reviews} Reviews</small>
                         </div>
                     </div>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--ivory); padding: 18px 20px; border-radius: 4px; border: 1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding: 18px; border-radius: 12px; margin-top:15px">
                     <div>
-                        <small style="color:var(--text-muted); text-transform:uppercase; font-size:0.65rem; letter-spacing:2px; font-weight:600; display:block; margin-bottom:4px;">Best price from</small>
-                        <h3 style="color:var(--charcoal); font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400;">Rp ${h.rooms[0].price.toLocaleString()}</h3>
+                        <small style="display:block; margin-bottom:4px;">Best price from</small>
+                        <h3 style="color:var(--charcoal);">Rp ${h.rooms[0].price.toLocaleString()}</h3>
                     </div>
-                    <button class="btn-gradient" onclick="openRoomModal(${h.id})" style="padding: 13px 26px;">Select Room</button>
+                    <button class="btn-gradient" onclick="openRoomModal(${h.id})">Select Room</button>
                 </div>
             </div>
         </div>`).join('');
 }
 
-// --- UPDATED LOGIC FOR MODAL CONTENT (DESC, REVIEWS, FACILITIES) ---
 function openRoomModal(hotelId) {
     const hotel = database.find(h => h.id === hotelId);
     document.getElementById('modal-hotel-name').innerText = hotel.name;
     document.getElementById('modal-hotel-loc').innerText = `Exclusive Stays in ${hotel.loc}`;
+    document.getElementById('modal-hotel-description').innerText = hotel.description;
     
-    // 1. Populate Description
-    document.getElementById('modal-hotel-description').innerHTML = `<p>${hotel.description}</p>`;
-
-    // 2. Populate Facilities
-    const facContainer = document.getElementById('modal-hotel-facilities');
-    facContainer.innerHTML = hotel.facilities.map(f => `<span class="facility-tag-detail">✦ ${f}</span>`).join('');
-
-    // 3. Populate Reviews
-    document.getElementById('review-stats').innerText = `5 from ${hotel.reviews.toLocaleString()} reviews`;
-    const reviewContainer = document.getElementById('modal-hotel-reviews');
-    reviewContainer.innerHTML = hotel.topReviews.map(rev => `
-        <div class="review-item">
-            <span class="review-user">${rev.user}</span>
-            <div class="review-stars">⭐⭐⭐⭐⭐</div>
-            <p class="review-text">"${rev.text}"</p>
+    document.getElementById('modal-hotel-facilities').innerHTML = hotel.facilities.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('');
+    document.getElementById('review-stats').innerText = `Rated ${hotel.rate} based on ${hotel.reviews} guests`;
+    document.getElementById('modal-hotel-reviews').innerHTML = hotel.topReviews.slice(0, 5).map(r => `
+        <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <strong>${r.user}</strong>
+            <p style="font-size: 0.85rem; margin-top: 5px; font-style: italic;">"${r.text}"</p>
         </div>
     `).join('');
 
-    // 4. Populate Room Selection
     const roomGrid = document.getElementById('room-grid');
     roomGrid.innerHTML = hotel.rooms.map(room => `
         <div class="room-card">
-            <img src="${room.img}" style="width: 100%; height: 190px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; display:block;">
-            <div style="flex-grow: 1;">
-                <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; margin-bottom:12px;">${room.name}</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                    ${room.fac.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('')}
-                </div>
+            <img src="${room.img}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
+            <h3 style="font-size:1.2rem; font-weight:700;">${room.name}</h3>
+            <div style="margin: 10px 0;">
+                ${room.fac.map(f => `<small style="background:#f0f0f0; padding:2px 8px; border-radius:4px; margin-right:5px;">${f}</small>`).join('')}
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #EDE9E0; padding-top: 18px;">
-                <div>
-                    <small style="color:var(--text-muted); font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase; display:block; margin-bottom:3px;">Per Night</small>
-                    <h4 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; color:var(--charcoal);">Rp ${room.price.toLocaleString()}</h4>
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <h4 style="color:var(--charcoal);">Rp ${room.price.toLocaleString()}</h4>
                 <button class="btn-gradient" onclick="confirmBooking('${hotel.name}', '${room.name}', ${room.price})">Reserve</button>
             </div>
         </div>`).join('');
-    
     document.getElementById('room-modal').style.display = 'flex';
 }
 
@@ -253,10 +260,8 @@ function confirmBooking(hName, rType, price) {
     const a = document.getElementById('count-adult').value;
     const c = document.getElementById('count-child').value;
     pendingBooking = { hName, rType, price, config: `${r} Room, ${a} Adult, ${c} Child` };
-
     document.getElementById('book-for').value = "self";
     toggleGuestFields();
-
     closeModal('room-modal');
     document.getElementById('confirm-form-modal').style.display = 'flex';
 }
@@ -282,20 +287,17 @@ function toggleGuestFields() {
 function proceedToPayment() {
     const name = document.getElementById('guest-name').value;
     const phone = document.getElementById('guest-phone').value;
-    if (!name || !phone) { alert("Complete your details!"); return; }
+    if (!name || !phone) { alert("Complete details!"); return; }
 
     pendingBooking.guestName = name;
     pendingBooking.guestPhone = phone;
     pendingBooking.guestKTP = (document.getElementById('book-for').value === 'self') ? currentUserObj.ktp : document.getElementById('guest-id-num').value;
 
     document.getElementById('payment-summary').innerHTML = `
-        <div class="receipt-row"><span>Hotel</span><strong>${pendingBooking.hName}</strong></div>
-        <div class="receipt-row"><span>Guest</span><strong>${name}</strong></div>
-        <div class="receipt-row"><span>Package</span><strong>${pendingBooking.config}</strong></div>
-        <div class="receipt-total">
-            <span style="font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Total Amount</span>
-            <strong style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:400; color:var(--charcoal);">Rp ${pendingBooking.price.toLocaleString()}</strong>
-        </div>
+        <p><strong>${pendingBooking.hName}</strong></p>
+        <p>${pendingBooking.rType} (${pendingBooking.config})</p>
+        <hr style="margin:10px 0; opacity:0.2">
+        <p>Total: <strong>Rp ${pendingBooking.price.toLocaleString()}</strong></p>
     `;
     closeModal('confirm-form-modal');
     document.getElementById('payment-modal').style.display = 'flex';
@@ -307,40 +309,34 @@ function processFinalPayment(method) {
     pendingBooking = null;
     closeModal('payment-modal');
     updateHistory();
-    showPage('home-page');
+    showPage('bookings-page', document.querySelector('.nav-item:nth-child(2)'));
 }
 
 function updateHistory() {
     const container = document.getElementById('booking-history');
+    if (bookings.length === 0) {
+        container.innerHTML = `<p style="color: rgba(255,255,255,0.7); font-style: italic;">No bookings yet.</p>`;
+        return;
+    }
     container.innerHTML = bookings.map((b, idx) => `
-        <div class="history-card" onclick="showReceipt(${idx})">
-            <div style="width: 100%;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h4 style="font-size:1rem; font-weight:500;">${b.hName}</h4>
-                    <span style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:400; color:var(--charcoal);">Rp ${b.price.toLocaleString()}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-top:8px; color:var(--text-muted); font-size:0.78rem; letter-spacing:0.3px;">
-                    <span>${b.rType} · ${b.date}</span>
-                    <span style="color:var(--gold-dark); font-weight:600; letter-spacing:0.5px;">View Receipt →</span>
-                </div>
+        <div class="history-card" onclick="showReceipt(${idx})" style="background:white; padding:20px; border-radius:15px; margin-bottom:15px; cursor:pointer;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="color:var(--charcoal);">${b.hName}</h4>
+                <strong>Rp ${b.price.toLocaleString()}</strong>
             </div>
+            <p style="font-size:0.8rem; color:#666; margin-top:5px;">${b.rType} • ${b.date}</p>
         </div>`).join('');
 }
 
 function showReceipt(idx) {
     const b = bookings[idx];
     document.getElementById('receipt-details').innerHTML = `
-        <div style="background:var(--ivory-warm); padding: 24px; border-radius: 4px; border: 1px solid var(--border);">
-            <div class="receipt-row"><span>Booking ID: </span><strong>#TRPZ-${1000 + idx}</strong></div>
-            <div class="receipt-row"><span>Guest Name: </span><strong>${b.guestName}</strong></div>
-            <div class="receipt-row"><span>Hotel: </span><strong>${b.hName}</strong></div>
-            <div class="receipt-row"><span>Room: </span><strong>${b.rType}</strong></div>
-            <div class="receipt-row"><span>ID Number: </span><strong>${b.guestKTP}</strong></div>
-            <div class="receipt-row"><span>Payment: </span><strong>${b.payment}</strong></div>
-            <div class="receipt-total">
-                <span style="font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Total Paid</span>
-                <strong style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:400; color:var(--gold-dark);">Rp ${b.price.toLocaleString()}</strong>
-            </div>
+        <div style="background:#f9f9f9; padding: 20px; border-radius: 12px;">
+            <p><strong>Booking ID:</strong> #TRPZ-${1000 + idx}</p>
+            <p><strong>Hotel:</strong> ${b.hName}</p>
+            <p><strong>Guest:</strong> ${b.guestName}</p>
+            <p><strong>Payment:</strong> ${b.payment}</p>
+            <p style="margin-top:10px; font-size:1.2rem; color:var(--gold-dark);">Total: Rp ${b.price.toLocaleString()}</p>
         </div>`;
     document.getElementById('receipt-modal').style.display = 'flex';
 }
