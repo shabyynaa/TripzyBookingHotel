@@ -48,11 +48,11 @@ const descriptions = [
 const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining", "Fitness Center", "Valet Parking"];
 
 const reviewTemplates = [
-    { user: "Alexander W.", text: "Absolutely stunning! The service was impeccable from the moment I arrived." },
-    { user: "Sophia L.", text: "The best stay I've ever had. The panoramic view from the suite is worth every penny." },
-    { user: "Budi Santoso", text: "Fasilitasnya sangat lengkap dan stafnya sangat membantu. Sangat direkomendasikan!" },
-    { user: "Yuki Tanaka", text: "A truly serene experience. The attention to detail in the room design is amazing." },
-    { user: "Michael G.", text: "Luxury at its finest. The breakfast spread was world-class." }
+    { user: "Syahri Banun", text: "Absolutely stunning! The service was impeccable from the moment I arrived." },
+    { user: "Chelsea", text: "The best stay I've ever had. The panoramic view from the suite is worth every penny." },
+    { user: "Fazle Mawla Wahyuhanda", text: "Fasilitasnya sangat lengkap dan stafnya sangat membantu. Sangat direkomendasikan!" },
+    { user: "Jylan Annisa Mumtaza Syidana", text: "A truly serene experience. The attention to detail in the room design is amazing." },
+    { user: "Sitti Aminah", text: "Luxury at its finest. The breakfast spread was world-class." }
 ];
 
 const roomTypes = [
