@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tripzy | Luxury Stays</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="hidden">
+        <div class="logo" onclick="showPage('home-page')">Tripzy</div>
+        <div id="user-info">Hi, Traveler ✦</div>
+    </nav>
+
+    <!-- AUTH PAGE -->
+    <section id="auth-page">
+        <div class="auth-card">
+            <span class="logo">Tripzy</span>
+            <div style="width: 40px; height: 1px; background: var(--gold); margin: 14px auto 20px;"></div>
+
+            <div id="login-section">
+                <p>Your journey to extraordinary begins here.</p>
+                <div class="input-group" style="margin-bottom:14px">
+                    <label>Username</label>
+                    <input type="text" id="login-id" placeholder="Enter your username">
+                </div>
+                <div class="input-group" style="margin-bottom:26px">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" placeholder="Enter your password">
+                </div>
+                <button class="btn-gradient" onclick="loginAction()" style="width: 100%; padding: 15px;">Sign In</button>
+                <p class="auth-toggle" onclick="toggleAuth(false)">New here? <span>Create Account</span></p>
+            </div>
+
+            <div id="signup-section" class="hidden">
+                <p>Create your account to start booking.</p>
+                <input type="text" id="signup-user" placeholder="Username">
+                <input type="password" id="signup-pass" placeholder="Password">
+                <input type="text" id="signup-fullname" placeholder="Full Name">
+                <input type="text" id="signup-ktp" placeholder="KTP Number">
+                <input type="tel" id="signup-phone" placeholder="Phone Number" style="margin-bottom:20px">
+                <button class="btn-gradient" onclick="signupAction()" style="width: 100%; padding: 15px;">Create Account</button>
+                <p class="auth-toggle" onclick="toggleAuth(true)">Already a member? <span>Sign In</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN APP -->
+    <main id="main-app" class="hidden">
+        <section id="home-page">
+
+            <!-- HERO -->
+            <div class="hero">
+                <h1>Beyond Your <em style="font-family: 'Playfair Display', serif; font-style: italic;">Imagination</em></h1>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search-container">
+                <div class="input-group">
+                    <label>Destination</label>
+                    <select id="search-loc">
+                        <option value="all">Everywhere</option>
+                        <option value="Surabaya">Surabaya, Indonesia</option>
+                        <option value="Jakarta">Jakarta, Indonesia</option>
+                        <option value="Bali">Bali, Indonesia</option>
+                        <option value="Japan">Tokyo & Kyoto, Japan</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Check-in</label>
+                    <input type="date" id="checkin">
+                </div>
+                <div class="input-group">
+                    <label>Check-out</label>
+                    <input type="date" id="checkout">
+                </div>
+                <div class="input-group">
+                    <label>Travelers</label>
+                    <div class="guest-box-inner">
+                        <select id="count-room" title="Rooms"></select>
+                        <select id="count-adult" title="Adults"></select>
+                        <select id="count-child" title="Children"></select>
+                    </div>
+                </div>
+                <button class="btn-gradient" onclick="performSearch()" style="height: 46px; white-space: nowrap;">Find Hotels</button>
+            </div>
+
+            <!-- CONTENT -->
+            <div style="padding: 0 6% 80px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+
+                <!-- UPCOMING -->
+                <div style="margin-bottom: 30px;">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Upcoming Stays</h3>
+                            <div class="gold-divider"></div>
+                        </div>
+                    </div>
+                    <div id="booking-history">
+                        <p style="color: var(--text-light); font-size: 0.88rem; font-style: italic; padding: 10px 0;">Ready for your next adventure?</p>
+                    </div>
+                </div>
+
+                <!-- RECOMMENDATIONS -->
+                <div>
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Handpicked for You</h3>
+                            <div class="gold-divider"></div>
+                        </div>
+                        <span class="section-link" onclick="performSearch()">View All →</span>
+                    </div>
+                    <div id="recommendations" class="recom-grid"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- RESULTS PAGE -->
+        <section id="results-page" class="hidden">
+            <div style="padding: 2.5rem 6% 0; max-width: 1200px; margin: auto;">
+                <button class="btn-outline" onclick="showPage('home-page')">← Back to Search</button>
+            </div>
+            <div id="hotel-list"></div>
+        </section>
+    </main>
+
+    <!-- ROOM MODAL -->
+    <div id="room-modal" class="modal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 6px;">
+                <div>
+                    <h2 id="modal-hotel-name" style="font-family:'Cormorant Garamond',serif; font-size: 2.2rem; font-weight:400; letter-spacing:-0.5px;">Select Your Suite</h2>
+                    <div class="gold-divider"></div>
+                </div>
+                <button onclick="closeModal('room-modal')" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-light); line-height:1; padding: 4px 8px; transition:color 0.3s;" onmouseover="this.style.color='var(--charcoal)'" onmouseout="this.style.color='var(--text-light)'">&times;</button>
+            </div>
+            <p id="modal-hotel-loc" style="color:var(--gold-dark); font-weight:500; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; margin-bottom: 10px;"></p>
+            <div id="room-grid" class="room-selection-grid"></div>
+        </div>
+    </div>
+
+    <!-- GUEST DETAILS MODAL -->
+    <div id="confirm-form-modal" class="modal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 28px;">
+                <div>
+                    <h2 style="font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:400;">Guest Details</h2>
+                    <div class="gold-divider"></div>
+                </div>
+                <button onclick="closeModal('confirm-form-modal')" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-light)">&times;</button>
+            </div>
+            <div class="input-group" style="margin-bottom: 18px;">
+                <label>Booking For</label>
+                <select id="book-for" onchange="toggleGuestFields()">
+                    <option value="self">Myself</option>
+                    <option value="others">Someone Else</option>
+                </select>
+            </div>
+            <div id="guest-details-form">
+                <div class="input-group" style="margin-bottom: 14px;"><label>Full Name</label><input type="text" id="guest-name"></div>
+                <div id="extra-guest-fields" class="hidden">
+                    <div class="input-group" style="margin-bottom: 14px;"><label>ID Number (KTP)</label><input type="text" id="guest-id-num"></div>
+                    <div class="input-group" style="margin-bottom: 14px;"><label>Email Address</label><input type="email" id="guest-email"></div>
+                </div>
+                <div class="input-group" style="margin-bottom: 14px;"><label>Phone Number</label><input type="tel" id="guest-phone"></div>
+                <div class="input-group" style="margin-bottom: 18px;"><label>Special Requests</label><textarea id="guest-requests" rows="2" style="resize:vertical;"></textarea></div>
+            </div>
+            <button class="btn-gradient" onclick="proceedToPayment()" style="width: 100%; padding: 16px;">Continue to Payment</button>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <h2 style="font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:400;">Secure Payment</h2>
+            <div class="gold-divider"></div>
+            <div id="payment-summary" style="background:var(--ivory-warm); border: 1px solid var(--border); padding: 24px; border-radius: 4px; margin: 24px 0;"></div>
+            <div class="payment-option" onclick="processFinalPayment('QRIS')"><span style="font-size:1.4rem"></span> <strong>QRIS</strong> <span style="color:var(--text-muted); font-size:0.8rem; margin-left:auto">Auto-Confirm</span></div>
+            <div class="payment-option" onclick="processFinalPayment('BCA')"><span style="font-size:1.4rem"></span> <strong>Virtual Account BCA</strong></div>
+            <div class="payment-option" onclick="processFinalPayment('DANA')"><span style="font-size:1.4rem"></span> <strong>DANA Wallet</strong></div>
+            <button class="btn-outline" style="width: 100%; margin-top: 14px;" onclick="closeModal('payment-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- RECEIPT MODAL -->
+    <div id="receipt-modal" class="modal">
+        <div class="modal-content" style="max-width: 460px; text-align: center;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(201,169,110,0.12); border: 2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; font-size: 1.6rem;">✓</div>
+            <h2 style="font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:400;">Booking Confirmed</h2>
+            <div class="gold-divider" style="margin: 14px auto;"></div>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom: 28px;">Your reservation has been successfully processed.</p>
+            <div id="receipt-details" style="text-align: left;"></div>
+            <button class="btn-gradient" style="width: 100%; margin-top: 28px; padding: 15px;" onclick="closeModal('receipt-modal')">Done</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
