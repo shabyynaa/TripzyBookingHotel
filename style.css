@@ -359,6 +359,90 @@ nav {
     border-top: 8px solid var(--pink);
 }
 
+/* ── TAMBAHAN UNTUK DETAIL MODAL (DESC, FACILITIES, REVIEWS) ── */
+
+/* Kontainer Fasilitas di dalam Modal */
+.modal-hotel-facilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* Tag fasilitas yang lebih berwarna */
+.facility-tag-detail {
+    font-size: 0.75rem;
+    background: var(--yellow-light);
+    color: var(--charcoal);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    border: 1px solid var(--yellow);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Kotak Review Item */
+.review-item {
+    background: var(--white);
+    padding: 18px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid var(--yellow-light);
+    transition: var(--transition);
+}
+
+.review-item:hover {
+    transform: translateX(5px);
+    border-color: var(--pink-light);
+}
+
+/* Nama User di Review */
+.review-user {
+    display: block;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--pink);
+    margin-bottom: 2px;
+}
+
+/* Rating Bintang (Opsional jika kamu pakai simbol bintang) */
+.review-stars {
+    color: var(--yellow);
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Teks Review */
+.review-text {
+    font-size: 0.85rem;
+    color: var(--charcoal-mid);
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* Statistik Review (e.g., 5 from 1,200 reviews) */
+.review-stats {
+    display: inline-block;
+    background: var(--pink);
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* Spasi tambahan untuk deskripsi */
+.modal-hotel-description {
+    padding: 10px 5px;
+    border-left: 4px solid var(--yellow);
+    padding-left: 15px;
+    margin-bottom: 30px;
+}
+
 .room-selection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

@@ -37,6 +37,24 @@ const hotelNames = {
     "Japan": ["Park Hyatt Tokyo", "Aman Tokyo", "Hoshinoya Kyoto", "The Ritz-Carlton Osaka", "The Peninsula Tokyo", "Mandarin Oriental Tokyo", "Suiran Kyoto", "Conrad Tokyo", "Four Seasons Otemachi", "Ritz-Carlton Kyoto"]
 };
 
+// --- TAMBAHAN DATA UNTUK DESKRIPSI, FASILITAS, & REVIEWS ---
+const descriptions = [
+    "Experience the pinnacle of luxury with world-class service and breathtaking views. Each corner is designed for your ultimate comfort.",
+    "A perfect blend of heritage charm and modern elegance. This property offers a unique sanctuary in the heart of the city.",
+    "Indulge in an oasis of tranquility featuring award-winning dining and unparalleled hospitality that makes you feel at home.",
+    "An architectural masterpiece offering a refined stay with state-of-the-art amenities and a sophisticated atmosphere."
+];
+
+const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining", "Fitness Center", "Valet Parking"];
+
+const reviewTemplates = [
+    { user: "Alexander W.", text: "Absolutely stunning! The service was impeccable from the moment I arrived." },
+    { user: "Sophia L.", text: "The best stay I've ever had. The panoramic view from the suite is worth every penny." },
+    { user: "Budi Santoso", text: "Fasilitasnya sangat lengkap dan stafnya sangat membantu. Sangat direkomendasikan!" },
+    { user: "Yuki Tanaka", text: "A truly serene experience. The attention to detail in the room design is amazing." },
+    { user: "Michael G.", text: "Luxury at its finest. The breakfast spread was world-class." }
+];
+
 const roomTypes = [
     { name: "Deluxe Modern", price: 3950000, img: "img/DeluxeRoom.jpg", fac: ["WiFi", "TV", "King Bed"] },
     { name: "Executive Suite", price: 2500000, img: "img/ExecutiveSuiteRoom.jpg", fac: ["Lounge Access", "Bathtub", "Mini Bar"] },
@@ -44,54 +62,10 @@ const roomTypes = [
 ];
 
 const locationPhotos = {
-    "Surabaya": [
-        "img/VasaHotelSurabaya.jpg",
-        "img/HotelMajapahitSurabaya.webp",
-        "img/ShangriLaSurabaya.jpg",
-        "img/WestinSurabaya.webp",
-        "img/JWMarriottSurabaya.webp",
-        "img/WyndhamSurabaya.webp",
-        "img/BumiSurabaya.webp",
-        "img/OakwoodSurabaya.webp",
-        "img/DoubleTreeSurabaya.webp",
-        "img/SheratonSurabaya.webp"
-    ],
-    "Jakarta": [
-        "img/RitzCaltonJakarta.jpg",
-        "img/KempinskiJakarta.jpg",
-        "img/RafflesJakarta.jpg",
-        "img/TheLanghamJakarta.jpg",
-        "img/ParkHyattJakarta.jpg",
-        "img/GrandHyattJakarta.webp",
-        "img/FairmontJakarta.webp",
-        "img/TheDarmawangsaJakarta.webp",
-        "img/MandarinOrientalJakarta.webp",
-        "img/AlilaSCBD.webp"
-    ],
-    "Bali": [
-        "img/TheApurvaKempinskiBali.webp",
-        "img/WBali.webp",
-        "img/AyanaBali.webp",
-        "img/AlilasVilaUluwatuBali.webp",
-        "img/HeadPotatoBali.webp",
-        "img/FourSeasonJimbaranBali.jpg",
-        "img/StRegisBali.webp",
-        "img/TheMuliaBali.webp",
-        "img/SixSensesBali.jpg",
-        "img/MayaUbudBali.jpg"
-    ],
-    "Japan": [
-        "img/ParkHyattJapan.jpg",
-        "img/AmanTokyoJapan.jpg",
-        "img/HoshinoyaKyoto.jpg",
-        "img/TheRitzCarltonOsaka.jpg",
-        "img/ThePeninsulaJapan.jpg",
-        "img/MandarinOrientalTokyo.jpg",
-        "img/SuiranKyotoJapan.webp",
-        "img/ConradTokyoJapan.jpg",
-        "img/FourSeasonOtemachi.webp",
-        "img/RitzCarltonTokyo.jpg"
-    ]
+    "Surabaya": ["img/VasaHotelSurabaya.jpg", "img/HotelMajapahitSurabaya.webp", "img/ShangriLaSurabaya.jpg", "img/WestinSurabaya.webp", "img/JWMarriottSurabaya.webp", "img/WyndhamSurabaya.webp", "img/BumiSurabaya.webp", "img/OakwoodSurabaya.webp", "img/DoubleTreeSurabaya.webp", "img/SheratonSurabaya.webp"],
+    "Jakarta": ["img/RitzCaltonJakarta.jpg", "img/KempinskiJakarta.jpg", "img/RafflesJakarta.jpg", "img/TheLanghamJakarta.jpg", "img/ParkHyattJakarta.jpg", "img/GrandHyattJakarta.webp", "img/FairmontJakarta.webp", "img/TheDarmawangsaJakarta.webp", "img/MandarinOrientalJakarta.webp", "img/AlilaSCBD.webp"],
+    "Bali": ["img/TheApurvaKempinskiBali.webp", "img/WBali.webp", "img/AyanaBali.webp", "img/AlilasVilaUluwatuBali.webp", "img/HeadPotatoBali.webp", "img/FourSeasonJimbaranBali.jpg", "img/StRegisBali.webp", "img/TheMuliaBali.webp", "img/SixSensesBali.jpg", "img/MayaUbudBali.jpg"],
+    "Japan": ["img/ParkHyattJapan.jpg", "img/AmanTokyoJapan.jpg", "img/HoshinoyaKyoto.jpg", "img/TheRitzCarltonOsaka.jpg", "img/ThePeninsulaJapan.jpg", "img/MandarinOrientalTokyo.jpg", "img/SuiranKyotoJapan.webp", "img/ConradTokyoJapan.jpg", "img/FourSeasonOtemachi.webp", "img/RitzCarltonTokyo.jpg"]
 };
 
 // Building the Database
@@ -99,14 +73,17 @@ let idCounter = 1;
 locations.forEach(loc => {
     hotelNames[loc].forEach((name, index) => {
         const rating = (4.5 + Math.random() * 0.5).toFixed(1);
-        const reviews = Math.floor(Math.random() * 5000) + 200;
+        const reviewsCount = Math.floor(Math.random() * 8000) + 1000; // Generate total reviews random
  
         database.push({
             id: idCounter++,
             name: name,
             loc: loc,
             rate: rating,
-            reviews: reviews,
+            reviews: reviewsCount,
+            description: descriptions[Math.floor(Math.random() * descriptions.length)], // Random desc
+            facilities: [...generalFacilities].sort(() => 0.5 - Math.random()).slice(0, 5), // Random 5 facilities
+            topReviews: reviewTemplates, // Top 5 reviews
             thumb: locationPhotos[loc][index],
             isLuxury: index < 3,
             rooms: roomTypes.map(r => ({
@@ -224,16 +201,37 @@ function renderResults(data) {
         </div>`).join('');
 }
 
+// --- UPDATED LOGIC FOR MODAL CONTENT (DESC, REVIEWS, FACILITIES) ---
 function openRoomModal(hotelId) {
     const hotel = database.find(h => h.id === hotelId);
     document.getElementById('modal-hotel-name').innerText = hotel.name;
     document.getElementById('modal-hotel-loc').innerText = `Exclusive Stays in ${hotel.loc}`;
+    
+    // 1. Populate Description
+    document.getElementById('modal-hotel-description').innerHTML = `<p>${hotel.description}</p>`;
+
+    // 2. Populate Facilities
+    const facContainer = document.getElementById('modal-hotel-facilities');
+    facContainer.innerHTML = hotel.facilities.map(f => `<span class="facility-tag-detail">✦ ${f}</span>`).join('');
+
+    // 3. Populate Reviews
+    document.getElementById('review-stats').innerText = `5 from ${hotel.reviews.toLocaleString()} reviews`;
+    const reviewContainer = document.getElementById('modal-hotel-reviews');
+    reviewContainer.innerHTML = hotel.topReviews.map(rev => `
+        <div class="review-item">
+            <span class="review-user">${rev.user}</span>
+            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+            <p class="review-text">"${rev.text}"</p>
+        </div>
+    `).join('');
+
+    // 4. Populate Room Selection
     const roomGrid = document.getElementById('room-grid');
     roomGrid.innerHTML = hotel.rooms.map(room => `
         <div class="room-card">
-            <img src="${room.img}" style="width: 100%; height: 190px; object-fit: cover; border-radius: 2px; margin-bottom: 20px; display:block;">
+            <img src="${room.img}" style="width: 100%; height: 190px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; display:block;">
             <div style="flex-grow: 1;">
-                <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:400; margin-bottom:12px;">${room.name}</h3>
+                <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; margin-bottom:12px;">${room.name}</h3>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                     ${room.fac.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('')}
                 </div>
@@ -241,11 +239,12 @@ function openRoomModal(hotelId) {
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #EDE9E0; padding-top: 18px;">
                 <div>
                     <small style="color:var(--text-muted); font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase; display:block; margin-bottom:3px;">Per Night</small>
-                    <h4 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:400; color:var(--charcoal);">Rp ${room.price.toLocaleString()}</h4>
+                    <h4 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; color:var(--charcoal);">Rp ${room.price.toLocaleString()}</h4>
                 </div>
                 <button class="btn-gradient" onclick="confirmBooking('${hotel.name}', '${room.name}', ${room.price})">Reserve</button>
             </div>
         </div>`).join('');
+    
     document.getElementById('room-modal').style.display = 'flex';
 }
 
