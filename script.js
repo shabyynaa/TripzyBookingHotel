@@ -179,10 +179,8 @@ function loginSuccessAction(user) {
     currentUserObj = user;
     document.getElementById('auth-page').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
-    // navbar atas tidak dipakai, pakai floating nav di bawah
     document.getElementById('user-info').innerText = `Hi, ${currentUserObj.name} ✦`;
     
-    // Fill Account Data
     document.getElementById('acc-name').innerText = currentUserObj.name;
     document.getElementById('acc-phone').innerText = currentUserObj.phone;
     document.getElementById('acc-ktp').innerText = currentUserObj.ktp;
@@ -194,15 +192,12 @@ function loginSuccessAction(user) {
 
 // fungsi untuk ganti pagenya berdasarkan navigation bar
 function showPage(pageId, navEl = null) {
-    // Hide all pages
     ['home-page', 'bookings-page', 'account-page', 'results-page'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
-    
-    // Show target page
+
     document.getElementById(pageId).classList.remove('hidden');
-    
-    // Update Nav UI
+
     if (navEl) {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         navEl.classList.add('active');
