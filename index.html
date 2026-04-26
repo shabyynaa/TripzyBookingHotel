@@ -11,11 +11,13 @@
 </head>
 <body>
 
+<!-- navigation bar -->
     <nav id="navbar">
         <div class="logo" onclick="showPage('home-page')">Tripzy</div>
         <div id="user-info">Hi, Traveler ✦</div>
     </nav>
 
+<!-- authentication page -->
     <section id="auth-page">
         <div class="auth-card">
             <span class="logo">Tripzy</span>
@@ -35,6 +37,7 @@
                 <p class="auth-toggle" onclick="toggleAuth(false)">New here? <span>Create Account</span></p>
             </div>
 
+<!-- sign up section -->
             <div id="signup-section" class="hidden">
                 <p>Create your account to start booking.</p>
                 <input type="text" id="signup-user" placeholder="Username">
@@ -48,6 +51,7 @@
         </div>
     </section>
 
+<!-- main application -->
     <main id="main-app" class="hidden">
         
         <section id="home-page">
@@ -55,6 +59,7 @@
                 <h1>Beyond Your <em>Imagination</em></h1>
             </div>
 
+<!-- tempat search -->
             <div class="search-container">
                 <div class="input-group">
                     <label>Destination</label>
@@ -85,6 +90,7 @@
                 <button class="btn-gradient" onclick="performSearch()" style="height: 46px; white-space: nowrap;">Find Hotels</button>
             </div>
 
+<!-- recommendations -->
             <div style="padding: 0 6% 80px; max-width: 1200px; margin-left: auto; margin-right: auto;">
                 <div>
                     <div class="section-header">
@@ -98,6 +104,7 @@
             </div>
         </section>
 
+<!-- bookings page -->
         <section id="bookings-page" class="hidden" style="padding: 100px 6% 120px;">
             <div style="max-width: 800px; margin: auto;">
                 <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--pink); margin-bottom: 10px;">My Bookings</h2>
@@ -108,6 +115,7 @@
             </div>
         </section>
 
+<!-- account page -->
         <section id="account-page" class="hidden" style="padding: 100px 6% 120px;">
             <div class="auth-card" style="max-width: 500px; margin: auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
                 <h2 style="font-size: 1.8rem; font-weight: 800; text-align: center;">Account Profile</h2>
@@ -129,6 +137,7 @@
             </div>
         </section>
 
+<!-- results page -->
         <section id="results-page" class="hidden">
             <div style="padding: 2.5rem 6% 0; max-width: 1200px; margin: auto;">
                 <button class="btn-outline" onclick="showPage('home-page')">← Back to Search</button>
@@ -136,6 +145,7 @@
             <div id="hotel-list"></div>
         </section>
 
+<!-- floating navigation bar -->
         <nav class="floating-nav">
             <div class="nav-item active" onclick="showPage('home-page', this)">
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -153,6 +163,7 @@
 
     </main>
 
+<!-- room modal -->
     <div id="room-modal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 6px;">
@@ -173,6 +184,7 @@
                 <div id="modal-hotel-facilities" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
             </div>
 
+<!-- reviews -->
             <div style="margin-bottom: 40px; background: var(--yellow-light); padding: 25px; border-radius: var(--radius);">
                 <h4 style="font-size: 1rem; margin-bottom: 5px; font-weight: 700;">What Guests Say</h4>
                 <p id="review-stats" style="font-size: 0.75rem; color: var(--pink); font-weight: 600; margin-bottom: 15px;"></p>
@@ -184,6 +196,7 @@
         </div>
     </div>
 
+<!-- confirmation form modal -->
     <div id="confirm-form-modal" class="modal">
         <div class="modal-content" style="max-width: 560px;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 28px;">
@@ -212,6 +225,7 @@
         </div>
     </div>
 
+<!-- payment modal -->
     <div id="payment-modal" class="modal">
         <div class="modal-content" style="max-width: 480px;">
             <h2 style="font-size:1.9rem; font-weight:800;">Secure Payment</h2>
@@ -224,6 +238,7 @@
         </div>
     </div>
 
+<!-- receipt modal -->
     <div id="receipt-modal" class="modal">
         <div class="modal-content" style="max-width: 460px; text-align: center;">
             <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--yellow); display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; font-size: 1.6rem; color: var(--white);">✓</div>

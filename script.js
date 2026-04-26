@@ -1,3 +1,4 @@
+// inisialisasi jumlah kamar, adult, dan anak pada dropdownnya
 function populateDropdowns() {
     const ids = ['count-room', 'count-adult', 'count-child'];
     ids.forEach(id => {
@@ -22,7 +23,7 @@ window.onload = function() {
     }
 };
 
-// --- EXPANDED DATABASE ---
+// database location, nama hotel, hotel room, alamat hotel, deskripsi, reviews, fasilitas, thumbnail, dll
 const locations = ["Surabaya", "Jakarta", "Bali", "Japan"];
 const database = [];
 
@@ -114,6 +115,7 @@ const locationPhotos = {
     "Japan": ["img/ParkHyattJapan.jpg", "img/AmanTokyoJapan.jpg", "img/HoshinoyaKyoto.jpg", "img/TheRitzCarltonOsaka.jpg", "img/ThePeninsulaJapan.jpg", "img/MandarinOrientalTokyo.jpg", "img/SuiranKyotoJapan.webp", "img/ConradTokyoJapan.jpg", "img/FourSeasonOtemachi.webp", "img/RitzCarltonTokyo.jpg"]
 };
 
+// generate random angka untuk ratings, reviews, and facilities
 let idCounter = 1;
 locations.forEach(loc => {
     hotelNames[loc].forEach((name, index) => {
@@ -136,13 +138,14 @@ locations.forEach(loc => {
         });
     });
 });
- 
+
+// app statenya disimpan disini (karena gak pake backend, jadi semua data disimpen di frontend, termasuk user dan bookingnya)
 let bookings = [];
 let users = [];
 let currentUserObj = null;
 let pendingBooking = null;
 
-// --- AUTH LOGIC ---
+// authentication logic
 function toggleAuth(isLogin) {
     document.getElementById('login-section').classList.toggle('hidden', !isLogin);
     document.getElementById('signup-section').classList.toggle('hidden', isLogin);
@@ -171,6 +174,7 @@ function loginAction() {
     } else { alert("Invalid credentials."); }
 }
 
+// setelah login berhasil, masuk ke halaman utama dan render rekomendasi hotel
 function loginSuccessAction(user) {
     currentUserObj = user;
     document.getElementById('auth-page').classList.add('hidden');
@@ -188,7 +192,7 @@ function loginSuccessAction(user) {
     renderRecommendations();
 }
 
-// --- NAVIGATION LOGIC ---
+// fungsi untuk ganti pagenya berdasarkan navigation bar
 function showPage(pageId, navEl = null) {
     // Hide all pages
     ['home-page', 'bookings-page', 'account-page', 'results-page'].forEach(id => {
@@ -206,7 +210,7 @@ function showPage(pageId, navEl = null) {
     window.scrollTo(0, 0);
 }
 
-// --- ACCOUNT LOGIC ---
+// fungsi untuk reveal password dengan konfirmasi nomor telepon
 function unlockPassword() {
     const phoneConfirm = prompt("To view password, please enter your Phone Number:");
     if (phoneConfirm === currentUserObj.phone) {
@@ -218,7 +222,7 @@ function unlockPassword() {
     }
 }
 
-// --- CORE APP LOGIC ---
+// fungsi untuk render recommend hotel di homepage, yang diambil dari database dengan filter isLuxury dan diacak
 function renderRecommendations() {
     const container = document.getElementById('recommendations');
     const luxuryOnes = database.filter(h => h.isLuxury).sort(() => 0.5 - Math.random()).slice(0, 4);
@@ -236,6 +240,7 @@ function renderRecommendations() {
     `).join('');
 }
 
+// fungsi untuk searching hotel berdasarkan lokasi yang dipilih, lalu render hasilnya di halaman results
 function performSearch() {
     const loc = document.getElementById('search-loc').value;
     const filtered = loc === "all" ? database : database.filter(h => h.loc === loc);
@@ -248,7 +253,6 @@ function renderResults(data) {
     if (data.length === 0) { list.innerHTML = "<h3>No hotels found.</h3>"; return; }
 
     list.innerHTML = data.map(h => {
-        // Logika variabel ditaruh di sini (sebelum return template)
         const address = hotelAddresses[h.loc][h.name] || "Address not available";
         
         return `
@@ -284,12 +288,12 @@ function renderResults(data) {
     }).join('');
 }
 
+// fungsi untuk membuka card yang menampilkan detail hotel, fasilitas, review, dan pilihan kamar yang bisa dipesan
 function openRoomModal(hotelId) {
     const hotel = database.find(h => h.id === hotelId);
     document.getElementById('modal-hotel-name').innerText = hotel.name;
     document.getElementById('modal-hotel-loc').innerText = `Exclusive Stays in ${hotel.loc}`;
-    
-    // INI TAMBAHANNYA: Mengisi alamat hotel ke dalam modal
+
     document.getElementById('modal-hotel-address').innerText = hotelAddresses[hotel.loc][hotel.name] || "Address not available";
     
     document.getElementById('modal-hotel-description').innerText = hotel.description;
@@ -319,6 +323,7 @@ function openRoomModal(hotelId) {
     document.getElementById('room-modal').style.display = 'flex';
 }
 
+// fungsi untuk membuka form konfirmasi booking
 function confirmBooking(hName, rType, price) {
     const r = document.getElementById('count-room').value;
     const a = document.getElementById('count-adult').value;
@@ -330,6 +335,7 @@ function confirmBooking(hName, rType, price) {
     document.getElementById('confirm-form-modal').style.display = 'flex';
 }
 
+// fungsi untuk toggle input tambahan jika memesan untuk orang lain
 function toggleGuestFields() {
     const type = document.getElementById('book-for').value;
     const extra = document.getElementById('extra-guest-fields');
@@ -348,6 +354,7 @@ function toggleGuestFields() {
     }
 }
 
+// fungsi untuk melanjutkan ke pembayaran setelah mengisi form konfirmasi booking
 function proceedToPayment() {
     const name = document.getElementById('guest-name').value;
     const phone = document.getElementById('guest-phone').value;
@@ -367,6 +374,7 @@ function proceedToPayment() {
     document.getElementById('payment-modal').style.display = 'flex';
 }
 
+// fungsi untuk memproses pembayaran, menyimpan booking ke history, dan ada alert payment successfully processednya
 function processFinalPayment(method) {
     bookings.unshift({ ...pendingBooking, date: new Date().toLocaleDateString(), payment: method });
     alert("Payment Securely Processed!");
@@ -376,6 +384,7 @@ function processFinalPayment(method) {
     showPage('bookings-page', document.querySelector('.nav-item:nth-child(2)'));
 }
 
+// fungsi untuk render history booking di halaman bookings
 function updateHistory() {
     const container = document.getElementById('booking-history');
     if (bookings.length === 0) {
@@ -392,6 +401,7 @@ function updateHistory() {
         </div>`).join('');
 }
 
+// fungsi untuk menampilkan receipt detail ketika klik di history booking
 function showReceipt(idx) {
     const b = bookings[idx];
     document.getElementById('receipt-details').innerHTML = `
@@ -405,4 +415,5 @@ function showReceipt(idx) {
     document.getElementById('receipt-modal').style.display = 'flex';
 }
 
+// fungsi untuk menutup modal
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
