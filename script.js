@@ -43,11 +43,11 @@ const descriptions = [
 const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining"];
 
 const reviewTemplates = [
-    { user: "Alexander W.", text: "Absolutely stunning! The service was impeccable." },
-    { user: "Sophia L.", text: "The best stay I've ever had. Panoramic views are worth it." },
-    { user: "Budi Santoso", text: "Fasilitas lengkap dan staf sangat membantu." },
-    { user: "Yuki Tanaka", text: "A truly serene experience. Amazing attention to detail." },
-    { user: "Michael G.", text: "Luxury at its finest. The breakfast spread was world-class." }
+    { user: "Syahri Banun", text: "Absolutely stunning! The service was impeccable." },
+    { user: "Muhammad Aditya Nugraha", text: "The best stay I've ever had. Panoramic views are worth it." },
+    { user: "Chelsea", text: "Fasilitas lengkap dan staf sangat membantu." },
+    { user: "Muhammad Dayyan Ghazanfar Latief", text: "A truly serene experience. Amazing attention to detail." },
+    { user: "Sitti Aminah", text: "Luxury at its finest. The breakfast spread was world-class." }
 ];
 
 const roomTypes = [
@@ -124,7 +124,7 @@ function loginSuccessAction(user) {
     currentUserObj = user;
     document.getElementById('auth-page').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
-    document.getElementById('navbar').classList.remove('hidden');
+    // navbar atas tidak dipakai, pakai floating nav di bawah
     document.getElementById('user-info').innerText = `Hi, ${currentUserObj.name} ✦`;
     
     // Fill Account Data

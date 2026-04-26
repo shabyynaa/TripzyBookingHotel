@@ -17,8 +17,7 @@
     --shadow-soft: 0 8px 20px rgba(255, 116, 177, 0.1);
     --shadow-card: 0 15px 35px rgba(255, 116, 177, 0.15);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --radius: 20px; /* Nilai rounded biar gemes */
-}
+    --radius: 20px; 
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -68,15 +67,15 @@ body {
 
 .floating-nav {
     position: fixed;
-    bottom: 30px; /* Jarak dari bawah layar */
+    bottom: 30px; 
     left: 50%;
-    transform: translateX(-50%); /* Rumus wajib biar center horizontal */
+    transform: translateX(-50%); 
     width: 90%;
     max-width: 380px; 
     height: 70px;
     background: rgba(255, 255, 255, 0.25); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 40px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -88,13 +87,21 @@ body {
     padding: 0 15px;
 }
 
+nav {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 1rem 40px; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(0, 0, 0, 0.6);
     transition: all 0.3s ease;
     gap: 4px;
     flex: 1;
@@ -105,6 +112,8 @@ body {
     width: 24px;
     height: 24px;
     transition: transform 0.3s ease;
+    stroke: currentColor;
+
 }
 
 .nav-item span {
@@ -116,7 +125,7 @@ body {
 
 /* State Aktif saat Navigasi Terpilih */
 .nav-item.active {
-    color: var(--yellow); /* Warna emas/kuning tema kamu */
+    color: var(--yellow); 
 }
 
 .nav-item.active svg {
@@ -125,7 +134,7 @@ body {
 }
 
 .nav-item:hover {
-    color: var(--white);
+    color: #000;
 }
 
 /* ── ACCOUNT PAGE SPECIFIC STYLING ── */
@@ -161,13 +170,11 @@ body {
     display: none !important;
 }
 
-/* Pastikan konten utama tidak tertutup navbar bawah */
 main {
     padding-bottom: 120px; 
 }
 
-/* Hero section dibikin transparan agar video terlihat */
-.hero, #home-page, #bookings-page, #account-page {
+#bookings-page, #account-page {
     background: transparent !important;
 }
 
@@ -176,20 +183,7 @@ h1 {
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    padding: 1rem 6%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid var(--yellow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    transition: var(--transition);
-}
+#main-app { padding-top: 0px; }
 
 .logo {
     font-family: 'Poppins', sans-serif;
@@ -311,11 +305,11 @@ nav {
 /* ── HERO ── */
 .hero {
     background-image: 
-        linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%),
-        url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1600&auto=format&fit=crop&q=80');
+        linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 100%),
+        url('img/Banner.jpg');
     background-size: cover;
     background-position: center;
-    padding: 6rem 6% 8rem;
+    padding: 2rem 6% 8rem;
     text-align: center;
     color: white;
     position: relative;
@@ -470,8 +464,6 @@ nav {
     border-top: 8px solid var(--pink);
 }
 
-/* ── TAMBAHAN UNTUK DETAIL MODAL (DESC, FACILITIES, REVIEWS) ── */
-
 /* Kontainer Fasilitas di dalam Modal */
 .modal-hotel-facilities {
     display: flex;
@@ -480,7 +472,7 @@ nav {
     margin-top: 5px;
 }
 
-/* Tag fasilitas yang lebih berwarna */
+/* Tag fasilitas */
 .facility-tag-detail {
     font-size: 0.75rem;
     background: var(--yellow-light);
@@ -518,7 +510,7 @@ nav {
     margin-bottom: 2px;
 }
 
-/* Rating Bintang (Opsional jika kamu pakai simbol bintang) */
+/* Rating Bintang */
 .review-stars {
     color: var(--yellow);
     font-size: 0.8rem;
@@ -534,7 +526,7 @@ nav {
     font-style: italic;
 }
 
-/* Statistik Review (e.g., 5 from 1,200 reviews) */
+/* Statistik Review */
 .review-stats {
     display: inline-block;
     background: var(--pink);
@@ -667,4 +659,4 @@ nav {
 @media (max-width: 640px) {
     .search-container { grid-template-columns: 1fr; margin-top: -40px; }
     .auth-card { padding: 2rem 1.5rem; border-radius: 20px; }
-}
+}}
