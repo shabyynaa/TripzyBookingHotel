@@ -1,9 +1,23 @@
-// inisialisasi jumlah kamar, adult, dan anak pada dropdownnya
+const API = {
+    hotels:  'api/hotel.php',
+    auth:    'api/auth.php',
+    booking: 'api/booking.php',
+};
+
+const DEV_MODE = true;
+
+// ── STATE ──
+let currentUserObj = null;
+let pendingBooking = null;
+let allHotels      = [];
+
+// ════════════════════════════════════════
+// INIT
 function populateDropdowns() {
     const ids = ['count-room', 'count-adult', 'count-child'];
     ids.forEach(id => {
         const el = document.getElementById(id);
-        for(let i=0; i<=10; i++) {
+        for (let i = 0; i <= 10; i++) {
             if (i === 0 && id !== 'count-child') continue;
             let opt = document.createElement('option');
             opt.value = i;
@@ -13,402 +27,429 @@ function populateDropdowns() {
         el.value = (id === 'count-child' ? 0 : 1);
     });
 }
-const DEV_MODE = false; 
 
-window.onload = function() {
+
+window.onload = async function () {
     populateDropdowns();
+
     if (DEV_MODE) {
-        currentUserObj = { name: "Dev User", phone: "08123456789", ktp: "0000000000", pass: "dev123" };
+        currentUserObj = { id: 1, full_name: 'Dev User', ktp: '0000000000', phone: '08123456789', role: 'user' };
         loginSuccessAction(currentUserObj);
+        return;
     }
+
+    // Cek apakah sudah login (session aktif)
+    try {
+        const res  = await fetch(`${API.auth}?action=me`);
+        const data = await res.json();
+        if (data.success) {
+            currentUserObj = data.user;
+            loginSuccessAction(currentUserObj);
+            return;
+        }
+    } catch (e) {}
+
+    // Belum login — tampil auth page
+    document.getElementById('auth-page').style.display = 'flex';
 };
 
-// database location, nama hotel, hotel room, alamat hotel, deskripsi, reviews, fasilitas, thumbnail, dll
-const locations = ["Surabaya", "Jakarta", "Bali", "Japan"];
-const database = [];
+// AUTH — LOGIN
+async function loginAction() {
+    const username = document.getElementById('login-id').value.trim();
+    const password = document.getElementById('login-pass').value.trim();
 
-const hotelNames = {
-    "Surabaya": ["Vasa Hotel", "Hotel Majapahit", "Shangri-La", "Westin Surabaya", "JW Marriott", "Wyndham Tower", "Bumi Surabaya", "Oakwood Suites", "DoubleTree", "Four Points by Sheraton Surabaya, Tunjungan Plaza"],
-    "Jakarta": ["The Ritz-Carlton", "Hotel Indonesia Kempinski", "Raffles Jakarta", "The Langham", "Park Hyatt", "Grand Hyatt", "Fairmont", "The Dharmawangsa", "Mandarin Oriental", "Alila SCBD"],
-    "Bali": ["The Apurva Kempinski", "W Bali Seminyak", "Ayana Resort", "Alila Villas Uluwatu", "Potato Head Studios", "Four Seasons Jimbaran", "St. Regis Bali", "The Mulia", "Six Senses Uluwatu", "Maya Ubud"],
-    "Japan": ["Park Hyatt Tokyo", "Aman Tokyo", "Hoshinoya Kyoto", "The Ritz-Carlton Osaka", "The Peninsula Tokyo", "Mandarin Oriental Tokyo", "Suiran Kyoto", "Conrad Tokyo", "Four Seasons Otemachi", "Ritz-Carlton Kyoto"]
-};
-
-const hotelAddresses = {
-    "Surabaya": {
-        "Vasa Hotel": "Jl. HR Muhammad No. 31, Sukomanunggal",
-        "Hotel Majapahit": "Jl. Tunjungan No. 65, Genteng",
-        "Shangri-La": "Jl. Mayjen Sungkono No. 120, Sawahan",
-        "Westin Surabaya": "Pakuwon Mall, Jl. Puncak Indah Lontar",
-        "JW Marriott": "Jl. Embong Malang No. 85, Tegalsari",
-        "Wyndham Tower": "Jl. Basuki Rahmat No. 67, Genteng",
-        "Bumi Surabaya": "Jl. Jenderal Basuki Rakhmat No. 106",
-        "Oakwood Suites": "Jl. Raya Kertajaya Indah No. 79, Manyar",
-        "DoubleTree": "Jl. Tunjungan No. 12, Genteng",
-        "Four Points by Sheraton Surabaya, Tunjungan Plaza": "Jl. Embong Malang No. 25, Tegalsari"
-    },
-    "Jakarta": {
-        "The Ritz-Carlton": "Mega Kuningan Kav. E1.1, Jakarta Selatan",
-        "Hotel Indonesia Kempinski": "Jl. MH Thamrin No. 1, Menteng",
-        "Raffles Jakarta": "Ciputra World 1, Jl. Prof. Dr. Satrio",
-        "The Langham": "District 8, SCBD Kav. 52-53, Jakarta Selatan",
-        "Park Hyatt": "Jl. Kebon Sirih No. 17-19, Menteng",
-        "Grand Hyatt": "Jl. M.H. Thamrin Kav. 28-30, Gondangdia",
-        "Fairmont": "Jl. Asia Afrika No. 8, Gelora Bung Karno",
-        "The Dharmawangsa": "Jl. Brawijaya Raya No. 26, Kebayoran Baru",
-        "Mandarin Oriental": "Jl. MH Thamrin, PO Box 3392",
-        "Alila SCBD": "SCBD Lot 11, Jl. Jenderal Sudirman"
-    },
-    "Bali": {
-        "The Apurva Kempinski": "Jl. Raya Nusa Dua Selatan, Sawangan",
-        "W Bali Seminyak": "Jl. Petitenget, Kerobokan, Seminyak",
-        "Ayana Resort": "Jl. Karang Mas Sejahtera, Jimbaran",
-        "Alila Villas Uluwatu": "Jl. Belimbing Sari, Tambiyak, Pecatu",
-        "Potato Head Studios": "Jl. Petitenget No. 51B, Seminyak",
-        "Four Seasons Jimbaran": "Jimbaran, Kuta Selatan",
-        "St. Regis Bali": "Kawasan Pariwisata Nusa Dua Lot S6",
-        "The Mulia": "Jl. Raya Nusa Dua Selatan, Kuta Selatan",
-        "Six Senses Uluwatu": "Jl. Goa Lempeh, Uluwatu, Pecatu",
-        "Maya Ubud": "Jl. Raya Gunung Sari Peliatan, Ubud"
-    },
-    "Japan": {
-        "Park Hyatt Tokyo": "3-7-1-2 Nishi Shinjuku, Shinjuku-ku, Tokyo",
-        "Aman Tokyo": "The Otemachi Tower, 1-5-6 Otemachi, Chiyoda-ku",
-        "Hoshinoya Kyoto": "11-2 Arashiyama Genrokuzan-cho, Nishikyo-ku",
-        "The Ritz-Carlton Osaka": "2-5-25 Umeda, Kita-ku, Osaka",
-        "The Peninsula Tokyo": "1-8-1 Yurakucho, Chiyoda-ku, Tokyo",
-        "Mandarin Oriental Tokyo": "2-1-1 Nihonbashi Muromachi, Chuo-ku",
-        "Suiran Kyoto": "12 Susukinobaba-cho, Saga-Tenryuji, Ukyo-ku",
-        "Conrad Tokyo": "1-9-1 Higashi-Shinbashi, Minato-ku",
-        "Four Seasons Otemachi": "1-2-1 Otemachi, Chiyoda-ku, Tokyo",
-        "Ritz-Carlton Kyoto": "Kamogawa Nijo-ohashi Hotori, Nakagyo-ku"
+    if (!username || !password) {
+        alert('Username dan password wajib diisi!');
+        return;
     }
-};
 
-const descriptions = [
-    "Experience the pinnacle of luxury with world-class service and breathtaking views.",
-    "A perfect blend of heritage charm and modern elegance in the heart of the city.",
-    "Indulge in an oasis of tranquility featuring award-winning dining.",
-    "An architectural masterpiece offering a refined stay with state-of-the-art amenities."
-];
-
-const generalFacilities = ["Infinity Pool", "Sky Lounge", "Luxury Spa", "24/7 Butler", "Fine Dining"];
-
-const reviewTemplates = [
-    { user: "Syahri Banun", text: "Absolutely stunning! The service was impeccable." },
-    { user: "Muhammad Aditya Nugraha", text: "Keren banget sumpah, pelayanannya gacor parah" },
-    { user: "Chelsea", text: "Ada gym btw, jadi bicep gue tambah gede" },
-    { user: "Muhammad Dayyan Ghazanfar Latief", text: "A truly exceptional experience." },
-    { user: "Sitti Aminah", text: "Luxury banget, emang recommended sih jujur, cuma harganya emang aga mahal" }
-];
-
-const roomTypes = [
-    { name: "Deluxe Modern", price: 3950000, img: "img/DeluxeRoom.jpg", fac: ["WiFi", "TV", "King Bed"] },
-    { name: "Executive Suite", price: 2500000, img: "img/ExecutiveSuiteRoom.jpg", fac: ["Lounge Access", "Bathtub", "Mini Bar"] },
-    { name: "Presidential Sky", price: 5800000, img: "img/PresidentialSuite.jpg", fac: ["Private Pool", "Butler", "Panoramic View"] }
-];
-
-const locationPhotos = {
-    "Surabaya": ["img/VasaHotelSurabaya.jpg", "img/HotelMajapahitSurabaya.webp", "img/ShangriLaSurabaya.jpg", "img/WestinSurabaya.webp", "img/JWMarriottSurabaya.webp", "img/WyndhamSurabaya.webp", "img/BumiSurabaya.webp", "img/OakwoodSurabaya.webp", "img/DoubleTreeSurabaya.webp", "img/SheratonSurabaya.webp"],
-    "Jakarta": ["img/RitzCaltonJakarta.jpg", "img/KempinskiJakarta.jpg", "img/RafflesJakarta.jpg", "img/TheLanghamJakarta.jpg", "img/ParkHyattJakarta.jpg", "img/GrandHyattJakarta.webp", "img/FairmontJakarta.webp", "img/TheDarmawangsaJakarta.webp", "img/MandarinOrientalJakarta.webp", "img/AlilaSCBD.webp"],
-    "Bali": ["img/TheApurvaKempinskiBali.webp", "img/WBali.webp", "img/AyanaBali.webp", "img/AlilasVilaUluwatuBali.webp", "img/HeadPotatoBali.webp", "img/FourSeasonJimbaranBali.jpg", "img/StRegisBali.webp", "img/TheMuliaBali.webp", "img/SixSensesBali.jpg", "img/MayaUbudBali.jpg"],
-    "Japan": ["img/ParkHyattJapan.jpg", "img/AmanTokyoJapan.jpg", "img/HoshinoyaKyoto.jpg", "img/TheRitzCarltonOsaka.jpg", "img/ThePeninsulaJapan.jpg", "img/MandarinOrientalTokyo.jpg", "img/SuiranKyotoJapan.webp", "img/ConradTokyoJapan.jpg", "img/FourSeasonOtemachi.webp", "img/RitzCarltonTokyo.jpg"]
-};
-
-// generate random angka untuk ratings, reviews, and facilities
-let idCounter = 1;
-locations.forEach(loc => {
-    hotelNames[loc].forEach((name, index) => {
-        const rating = (4.5 + Math.random() * 0.5).toFixed(1);
-        database.push({
-            id: idCounter++,
-            name: name,
-            loc: loc,
-            rate: rating,
-            reviews: Math.floor(Math.random() * 5000) + 200,
-            description: descriptions[Math.floor(Math.random() * descriptions.length)],
-            facilities: [...generalFacilities].sort(() => 0.5 - Math.random()).slice(0, 5),
-            topReviews: reviewTemplates,
-            thumb: locationPhotos[loc][index],
-            isLuxury: index < 3,
-            rooms: roomTypes.map(r => ({
-                ...r,
-                price: r.price + (index * 100000) + (loc === "Japan" ? 2000000 : 0)
-            }))
+    try {
+        const res  = await fetch(`${API.auth}?action=login`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ username, password }),
         });
-    });
-});
+        const data = await res.json();
 
-// app statenya disimpan disini (karena gak pake backend, jadi semua data disimpen di frontend, termasuk user dan bookingnya)
-let bookings = [];
-let users = [];
-let currentUserObj = null;
-let pendingBooking = null;
-
-// authentication logic
-function toggleAuth(isLogin) {
-    document.getElementById('login-section').classList.toggle('hidden', !isLogin);
-    document.getElementById('signup-section').classList.toggle('hidden', isLogin);
+        if (data.success) {
+            currentUserObj = data.user;
+            loginSuccessAction(data.user);
+        } else {
+            alert(data.message || 'Login gagal');
+        }
+    } catch (e) {
+        alert('Terjadi kesalahan, coba lagi.');
+    }
 }
 
-function signupAction() {
-    const user = document.getElementById('signup-user').value;
-    const pass = document.getElementById('signup-pass').value;
-    const name = document.getElementById('signup-fullname').value;
-    const ktp = document.getElementById('signup-ktp').value;
-    const phone = document.getElementById('signup-phone').value;
-    if (user && pass && name && ktp && phone) {
-        users.push({ user, pass, name, ktp, phone });
-        alert("Account created! Please sign in.");
-        toggleAuth(true);
-    } else { alert("Please fill all fields!"); }
+// AUTH — REGISTER
+async function signupAction() {
+    const username  = document.getElementById('signup-user').value.trim();
+    const password  = document.getElementById('signup-pass').value.trim();
+    const full_name = document.getElementById('signup-fullname').value.trim();
+    const ktp       = document.getElementById('signup-ktp').value.trim();
+    const phone     = document.getElementById('signup-phone').value.trim();
+
+    if (!username || !password || !full_name || !ktp || !phone) {
+        alert('Semua field wajib diisi!');
+        return;
+    }
+
+    try {
+        const res  = await fetch(`${API.auth}?action=register`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ username, password, full_name, ktp, phone }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('Registrasi berhasil! Silakan login.');
+            toggleAuth(true);
+        } else {
+            alert(data.message || 'Registrasi gagal');
+        }
+    } catch (e) {
+        alert('Terjadi kesalahan, coba lagi.');
+    }
 }
 
-function loginAction() {
-    const userIn = document.getElementById('login-id').value;
-    const passIn = document.getElementById('login-pass').value;
-    const foundUser = users.find(u => u.user === userIn && u.pass === passIn) || (userIn === "admin" && passIn === "admin" ? {name: "Admin User", phone: "08123", ktp: "123", pass: "admin"} : null);
-
-    if (foundUser) {
-        loginSuccessAction(foundUser);
-    } else { alert("Invalid credentials."); }
-}
-
-// setelah login berhasil, masuk ke halaman utama dan render rekomendasi hotel
-function loginSuccessAction(user) {
-    currentUserObj = user;
-    document.getElementById('auth-page').classList.add('hidden');
+// AFTER LOGIN SUCCESS
+async function loginSuccessAction(user) {
+    document.getElementById('auth-page').style.display  = 'none';
     document.getElementById('main-app').classList.remove('hidden');
-    document.getElementById('user-info').innerText = `Hi, ${currentUserObj.name} ✦`;
-    
-    document.getElementById('acc-name').innerText = currentUserObj.name;
-    document.getElementById('acc-phone').innerText = currentUserObj.phone;
-    document.getElementById('acc-ktp').innerText = currentUserObj.ktp;
-    document.getElementById('acc-pass').value = "********"; 
-    
+    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('user-info').innerText = `Hi, ${user.full_name} ✦`;
+
+    if (document.getElementById('acc-name'))  document.getElementById('acc-name').innerText  = user.full_name;
+    if (document.getElementById('acc-ktp'))   document.getElementById('acc-ktp').innerText   = user.ktp;
+    if (document.getElementById('acc-phone')) document.getElementById('acc-phone').innerText = user.phone;
+
     showPage('home-page');
+    await loadHotels();
     renderRecommendations();
+    loadBookingHistory();
 }
 
-// fungsi untuk ganti pagenya berdasarkan navigation bar
-function showPage(pageId, navEl = null) {
-    ['home-page', 'bookings-page', 'account-page', 'results-page'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
-
-    document.getElementById(pageId).classList.remove('hidden');
-
-    if (navEl) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        navEl.classList.add('active');
-    }
-    window.scrollTo(0, 0);
-}
-
-// fungsi untuk reveal password dengan konfirmasi nomor telepon
-function unlockPassword() {
-    const phoneConfirm = prompt("To view password, please enter your Phone Number:");
-    if (phoneConfirm === currentUserObj.phone) {
-        document.getElementById('acc-pass').value = currentUserObj.pass;
-        document.getElementById('acc-pass').type = "text";
-        alert("Password Unlocked.");
-    } else {
-        alert("Phone number does not match.");
+// LOAD HOTELS DARI DATABASE
+async function loadHotels(loc = 'all') {
+    try {
+        const url = loc === 'all'
+            ? API.hotels
+            : `${API.hotels}?loc=${encodeURIComponent(loc)}`;
+        const res = await fetch(url);
+        allHotels = await res.json();
+        return allHotels;
+    } catch (e) {
+        console.error('Gagal load hotel:', e);
+        return [];
     }
 }
 
-// fungsi untuk render recommend hotel di homepage, yang diambil dari database dengan filter isLuxury dan diacak
-function renderRecommendations() {
-    const container = document.getElementById('recommendations');
-    const luxuryOnes = database.filter(h => h.isLuxury).sort(() => 0.5 - Math.random()).slice(0, 4);
-    container.innerHTML = luxuryOnes.map(h => `
-        <div class="recom-card" onclick="openRoomModal(${h.id})">
-            <div style="overflow:hidden;">
-                <img src="${h.thumb}" class="recom-img">
-            </div>
-            <div class="recom-info">
-                <small style="color:var(--gold-dark); font-weight:600; font-size:0.68rem; letter-spacing:2px; text-transform:uppercase;">${h.loc}</small>
-                <h4 style="margin: 6px 0 8px; font-size:1rem; font-weight:500;">${h.name}</h4>
-                <p style="color:var(--charcoal); font-weight:600; font-size:0.9rem;">Rp ${h.rooms[0].price.toLocaleString()} <span style="color:var(--text-muted); font-weight:400; font-size:0.75rem;">/ night</span></p>
-            </div>
-        </div>
-    `).join('');
-}
-
-// fungsi untuk searching hotel berdasarkan lokasi yang dipilih, lalu render hasilnya di halaman results
-function performSearch() {
+// SEARCH
+async function performSearch() {
     const loc = document.getElementById('search-loc').value;
-    const filtered = loc === "all" ? database : database.filter(h => h.loc === loc);
-    renderResults(filtered);
     showPage('results-page');
+    const hotels = await loadHotels(loc);
+    renderResults(hotels);
 }
 
+// RENDER HOTEL LIST
 function renderResults(data) {
     const list = document.getElementById('hotel-list');
-    if (data.length === 0) { list.innerHTML = "<h3>No hotels found.</h3>"; return; }
-
-    list.innerHTML = data.map(h => {
-        const address = hotelAddresses[h.loc][h.name] || "Address not available";
-        
-        return `
+    if (!data || data.length === 0) {
+        list.innerHTML = '<p style="text-align:center; padding:40px; color:#999;">Tidak ada hotel ditemukan.</p>';
+        return;
+    }
+    list.innerHTML = data.map(h => `
         <div class="hotel-card">
-            <img src="${h.thumb}" class="hotel-img-large">
+            <img src="${h.thumb_url}" class="hotel-img-large" onerror="this.src='img/placeholder.jpg'">
             <div class="hotel-details">
                 <div>
-                    ${h.isLuxury ? '<span class="badge-luxury"> Luxury Collection</span>' : ''}
-                    <div style="display:flex; justify-content:space-between; align-items: flex-start;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
-                            <h2 style="font-family:'Poppins',sans-serif; font-size: 1.7rem; font-weight:700;">${h.name}</h2>
-                            <p class="hotel-address" style="font-size: 0.85rem; color: var(--pink); margin-bottom: 5px;">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                ${address}
-                            </p>
-                            <p style="color:var(--text-muted); font-size:0.82rem; letter-spacing:1px; text-transform:uppercase;">📍 ${h.loc}</p>
+                            <h2 style="font-size:1.4rem; font-weight:800;">${h.name}</h2>
+                            <p style="color:#888; font-size:0.85rem; margin-top:4px;">📍 ${h.location}</p>
                         </div>
                         <div style="text-align:right;">
-                            <div style="color:var(--gold-dark); font-weight:600;">⭐ ${h.rate}</div>
-                            <small>${h.reviews} Reviews</small>
+                            <div style="font-weight:700; color:var(--yellow);">⭐ ${h.rating}</div>
+                            <small style="color:#aaa;">${Number(h.review_count).toLocaleString()} Reviews</small>
                         </div>
                     </div>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding: 18px; border-radius: 12px; margin-top:15px">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:18px; border-radius:12px; margin-top:15px; border:1px solid #f0f0f0;">
                     <div>
-                        <small style="display:block; margin-bottom:4px;">Best price from</small>
-                        <h3 style="color:var(--charcoal);">Rp ${h.rooms[0].price.toLocaleString()}</h3>
+                        <small style="display:block; margin-bottom:4px; color:#999;">Best price from</small>
+                        <h3 style="color:var(--charcoal);">Rp ${Number(h.min_price).toLocaleString()}</h3>
                     </div>
                     <button class="btn-gradient" onclick="openRoomModal(${h.id})">Select Room</button>
                 </div>
             </div>
-        </div>`;
-    }).join('');
+        </div>`).join('');
 }
 
-// fungsi untuk membuka card yang menampilkan detail hotel, fasilitas, review, dan pilihan kamar yang bisa dipesan
-function openRoomModal(hotelId) {
-    const hotel = database.find(h => h.id === hotelId);
-    document.getElementById('modal-hotel-name').innerText = hotel.name;
-    document.getElementById('modal-hotel-loc').innerText = `Exclusive Stays in ${hotel.loc}`;
-
-    document.getElementById('modal-hotel-address').innerText = hotelAddresses[hotel.loc][hotel.name] || "Address not available";
-    
-    document.getElementById('modal-hotel-description').innerText = hotel.description;
-    
-    document.getElementById('modal-hotel-facilities').innerHTML = hotel.facilities.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('');
-    document.getElementById('review-stats').innerText = `Rated ${hotel.rate} based on ${hotel.reviews} guests`;
-    document.getElementById('modal-hotel-reviews').innerHTML = hotel.topReviews.slice(0, 5).map(r => `
-        <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
-            <strong>${r.user}</strong>
-            <p style="font-size: 0.85rem; margin-top: 5px; font-style: italic;">"${r.text}"</p>
-        </div>
-    `).join('');
-
-    const roomGrid = document.getElementById('room-grid');
-    roomGrid.innerHTML = hotel.rooms.map(room => `
-        <div class="room-card">
-            <img src="${room.img}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
-            <h3 style="font-size:1.2rem; font-weight:700;">${room.name}</h3>
-            <div style="margin: 10px 0;">
-                ${room.fac.map(f => `<small style="background:#f0f0f0; padding:2px 8px; border-radius:4px; margin-right:5px;">${f}</small>`).join('')}
+// RENDER RECOMMENDATIONS
+function renderRecommendations() {
+    const container = document.getElementById('recommendations');
+    if (!container) return;
+    const top = allHotels.slice(0, 8);
+    container.innerHTML = top.map(h => `
+        <div class="recom-card" onclick="openRoomModal(${h.id})">
+            <div style="overflow:hidden; height:160px;">
+                <img src="${h.thumb_url}" class="recom-img" onerror="this.src='img/placeholder.jpg'">
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <h4 style="color:var(--charcoal);">Rp ${room.price.toLocaleString()}</h4>
-                <button class="btn-gradient" onclick="confirmBooking('${hotel.name}', '${room.name}', ${room.price})">Reserve</button>
+            <div class="recom-info">
+                <small style="color:var(--pink); font-weight:700;">${h.location}</small>
+                <h4 style="margin:5px 0; font-size:0.95rem;">${h.name}</h4>
+                <p style="color:var(--charcoal); font-weight:700; font-size:0.9rem;">
+                    Rp ${Number(h.min_price).toLocaleString()}
+                    <span style="color:#aaa; font-weight:400; font-size:0.75rem;"> / malam</span>
+                </p>
             </div>
         </div>`).join('');
-    document.getElementById('room-modal').style.display = 'flex';
 }
 
-// fungsi untuk membuka form konfirmasi booking
-function confirmBooking(hName, rType, price) {
+// OPEN ROOM MODAL
+async function openRoomModal(hotelId) {
+    try {
+        const res   = await fetch(`${API.hotels}?id=${hotelId}`);
+        const hotel = await res.json();
+
+        document.getElementById('modal-hotel-name').innerText = hotel.name;
+        document.getElementById('modal-hotel-loc').innerText  = `Exclusive Stays in ${hotel.location}`;
+
+        if (document.getElementById('modal-hotel-address')) {
+            document.getElementById('modal-hotel-address').innerText = hotel.address || hotel.location;
+        }
+        if (document.getElementById('modal-hotel-description')) {
+            document.getElementById('modal-hotel-description').innerText = hotel.description || '-';
+        }
+
+        const facEl = document.getElementById('modal-hotel-facilities');
+        if (facEl) {
+            const facs = Array.isArray(hotel.facilities) ? hotel.facilities : JSON.parse(hotel.facilities || '[]');
+            facEl.innerHTML = facs.map(f => `<span class="facility-tag">✦ ${f}</span>`).join('');
+        }
+
+        const reviewStatsEl = document.getElementById('review-stats');
+        if (reviewStatsEl) reviewStatsEl.innerText = `Rated ${hotel.rating} based on ${Number(hotel.review_count).toLocaleString()} guests`;
+
+        const reviewEl = document.getElementById('modal-hotel-reviews');
+        if (reviewEl) {
+            reviewEl.innerHTML = hotel.reviews && hotel.reviews.length > 0
+                ? hotel.reviews.map(r => `
+                    <div style="border-bottom:1px solid #eee; padding-bottom:10px;">
+                        <strong>${r.reviewer}</strong>
+                        <span style="color:var(--yellow); margin-left:8px;">${'★'.repeat(r.rating)}</span>
+                        <p style="font-size:0.85rem; margin-top:5px; font-style:italic;">"${r.comment}"</p>
+                    </div>`).join('')
+                : '<p style="color:#aaa; font-style:italic;">Belum ada review.</p>';
+        }
+
+        const roomGrid = document.getElementById('room-grid');
+        roomGrid.innerHTML = hotel.rooms && hotel.rooms.length > 0
+            ? hotel.rooms.map(room => {
+                const facs = Array.isArray(room.facilities)
+                    ? room.facilities
+                    : JSON.parse(room.facilities || '[]');
+                return `
+                <div class="room-card">
+                    <img src="${room.img_url || room.img}" style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:15px;" onerror="this.src='img/placeholder.jpg'">
+                    <h3 style="font-size:1.1rem; font-weight:700;">${room.name}</h3>
+                    <div style="margin:10px 0;">
+                        ${facs.map(f => `<small style="background:#f0f0f0; padding:2px 8px; border-radius:4px; margin-right:5px;">${f}</small>`).join('')}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                        <h4 style="color:var(--charcoal);">Rp ${Number(room.price).toLocaleString()}</h4>
+                        <button class="btn-gradient" onclick="confirmBooking('${hotel.name}', '${room.name}', ${room.price}, ${room.id}, ${hotel.id})">Reserve</button>
+                    </div>
+                </div>`;
+            }).join('')
+            : '<p style="color:#aaa;">Tidak ada kamar tersedia.</p>';
+
+        document.getElementById('room-modal').style.display = 'flex';
+    } catch (e) {
+        console.error('Gagal load detail hotel:', e);
+        alert('Gagal memuat detail hotel.');
+    }
+}
+
+// BOOKING
+function confirmBooking(hName, rType, price, roomId, hotelId) {
     const r = document.getElementById('count-room').value;
     const a = document.getElementById('count-adult').value;
     const c = document.getElementById('count-child').value;
-    pendingBooking = { hName, rType, price, config: `${r} Room, ${a} Adult, ${c} Child` };
-    document.getElementById('book-for').value = "self";
+    pendingBooking = { hName, rType, price, roomId, hotelId, config: `${r} Room, ${a} Adult, ${c} Child`, roomCount: r, adultCount: a, childCount: c };
+    document.getElementById('book-for').value = 'self';
     toggleGuestFields();
     closeModal('room-modal');
     document.getElementById('confirm-form-modal').style.display = 'flex';
 }
 
-// fungsi untuk toggle input tambahan jika memesan untuk orang lain
 function toggleGuestFields() {
-    const type = document.getElementById('book-for').value;
-    const extra = document.getElementById('extra-guest-fields');
-    const nameInput = document.getElementById('guest-name');
+    const type       = document.getElementById('book-for').value;
+    const extra      = document.getElementById('extra-guest-fields');
+    const nameInput  = document.getElementById('guest-name');
     const phoneInput = document.getElementById('guest-phone');
 
     if (type === 'self' && currentUserObj) {
-        nameInput.value = currentUserObj.name;
+        nameInput.value  = currentUserObj.full_name || currentUserObj.name;
         phoneInput.value = currentUserObj.phone;
         extra.classList.add('hidden');
-        nameInput.disabled = true; phoneInput.disabled = true;
+        nameInput.disabled  = true;
+        phoneInput.disabled = true;
     } else {
-        nameInput.value = ""; phoneInput.value = "";
+        nameInput.value  = '';
+        phoneInput.value = '';
         extra.classList.remove('hidden');
-        nameInput.disabled = false; phoneInput.disabled = false;
+        nameInput.disabled  = false;
+        phoneInput.disabled = false;
     }
 }
 
-// fungsi untuk melanjutkan ke pembayaran setelah mengisi form konfirmasi booking
 function proceedToPayment() {
-    const name = document.getElementById('guest-name').value;
+    const name  = document.getElementById('guest-name').value;
     const phone = document.getElementById('guest-phone').value;
-    if (!name || !phone) { alert("Complete details!"); return; }
+    if (!name || !phone) { alert('Lengkapi data tamu!'); return; }
 
-    pendingBooking.guestName = name;
+    pendingBooking.guestName  = name;
     pendingBooking.guestPhone = phone;
-    pendingBooking.guestKTP = (document.getElementById('book-for').value === 'self') ? currentUserObj.ktp : document.getElementById('guest-id-num').value;
+    pendingBooking.guestKTP   = (document.getElementById('book-for').value === 'self')
+        ? (currentUserObj.ktp || '')
+        : (document.getElementById('guest-id-num')?.value || '');
 
     document.getElementById('payment-summary').innerHTML = `
         <p><strong>${pendingBooking.hName}</strong></p>
         <p>${pendingBooking.rType} (${pendingBooking.config})</p>
         <hr style="margin:10px 0; opacity:0.2">
-        <p>Total: <strong>Rp ${pendingBooking.price.toLocaleString()}</strong></p>
-    `;
+        <p>Total: <strong>Rp ${Number(pendingBooking.price).toLocaleString()}</strong></p>`;
     closeModal('confirm-form-modal');
     document.getElementById('payment-modal').style.display = 'flex';
 }
 
-// fungsi untuk memproses pembayaran, menyimpan booking ke history, dan ada alert payment successfully processednya
-function processFinalPayment(method) {
-    bookings.unshift({ ...pendingBooking, date: new Date().toLocaleDateString(), payment: method });
-    alert("Payment Securely Processed!");
-    pendingBooking = null;
-    closeModal('payment-modal');
-    updateHistory();
-    showPage('bookings-page', document.querySelector('.nav-item:nth-child(2)'));
+// PROSES BAYAR
+async function processFinalPayment(method) {
+    try {
+        const payload = {
+            hotel_id:       pendingBooking.hotelId,
+            room_id:        pendingBooking.roomId,
+            guest_name:     pendingBooking.guestName,
+            guest_ktp:      pendingBooking.guestKTP,
+            guest_phone:    pendingBooking.guestPhone,
+            room_count:     pendingBooking.roomCount,
+            adult_count:    pendingBooking.adultCount,
+            child_count:    pendingBooking.childCount,
+            checkin:        document.getElementById('checkin')?.value  || null,
+            checkout:       document.getElementById('checkout')?.value || null,
+            total_price:    pendingBooking.price,
+            payment_method: method,
+            special_req:    document.getElementById('guest-requests')?.value || '',
+        };
+
+        const res  = await fetch(API.booking, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            closeModal('payment-modal');
+            showReceipt(data.booking);
+            pendingBooking = null;
+            loadBookingHistory();
+        } else {
+            alert(data.message || 'Pembayaran gagal');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan saat memproses pembayaran.');
+    }
 }
 
-// fungsi untuk render history booking di halaman bookings
-function updateHistory() {
+// BOOKING HISTORY
+async function loadBookingHistory() {
+    try {
+        const res  = await fetch(`${API.booking}?user_id=${currentUserObj.id}`);
+        const data = await res.json();
+        renderBookingHistory(data);
+    } catch (e) {
+        console.error('Gagal load history:', e);
+    }
+}
+
+function renderBookingHistory(bookings) {
     const container = document.getElementById('booking-history');
-    if (bookings.length === 0) {
-        container.innerHTML = `<p style="color: rgba(255,255,255,0.7); font-style: italic;">No bookings yet.</p>`;
+    if (!container) return;
+    if (!bookings || bookings.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.7); font-style:italic;">Belum ada booking.</p>';
         return;
     }
-    container.innerHTML = bookings.map((b, idx) => `
-        <div class="history-card" onclick="showReceipt(${idx})" style="background:white; padding:20px; border-radius:15px; margin-bottom:15px; cursor:pointer;">
+    container.innerHTML = bookings.map(b => `
+        <div class="history-card" onclick="showReceiptById('${b.booking_code}')" style="cursor:pointer;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="color:var(--charcoal);">${b.hName}</h4>
-                <strong>Rp ${b.price.toLocaleString()}</strong>
+                <h4 style="color:var(--charcoal);">${b.hotel_name}</h4>
+                <strong>Rp ${Number(b.total_price).toLocaleString()}</strong>
             </div>
-            <p style="font-size:0.8rem; color:#666; margin-top:5px;">${b.rType} • ${b.date}</p>
+            <p style="font-size:0.8rem; color:#666; margin-top:5px;">
+                ${b.room_name} • ${b.created_at?.split(' ')[0]}
+            </p>
         </div>`).join('');
 }
 
-// fungsi untuk menampilkan receipt detail ketika klik di history booking
-function showReceipt(idx) {
-    const b = bookings[idx];
+// RECEIPT
+function showReceipt(b) {
     document.getElementById('receipt-details').innerHTML = `
-        <div style="background:#f9f9f9; padding: 20px; border-radius: 12px;">
-            <p><strong>Booking ID:</strong> #TRPZ-${1000 + idx}</p>
-            <p><strong>Hotel:</strong> ${b.hName}</p>
-            <p><strong>Guest:</strong> ${b.guestName}</p>
-            <p><strong>Payment:</strong> ${b.payment}</p>
-            <p style="margin-top:10px; font-size:1.2rem; color:var(--gold-dark);">Total: Rp ${b.price.toLocaleString()}</p>
+        <div style="background:#f9f9f9; padding:20px; border-radius:12px; line-height:1.8;">
+            <p><strong>Booking ID:</strong> ${b.booking_code}</p>
+            <p><strong>Hotel:</strong> ${b.hotel_name}</p>
+            <p><strong>Kamar:</strong> ${b.room_name}</p>
+            <p><strong>Tamu:</strong> ${b.guest_name}</p>
+            <p><strong>KTP:</strong> ${b.guest_ktp}</p>
+            <p><strong>Pembayaran:</strong> ${b.payment_method}</p>
+            <hr style="margin:10px 0; opacity:0.2">
+            <p style="font-size:1.1rem;"><strong>Total: Rp ${Number(b.total_price).toLocaleString()}</strong></p>
         </div>`;
     document.getElementById('receipt-modal').style.display = 'flex';
 }
 
-// fungsi untuk menutup modal
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+async function showReceiptById(bookingCode) {
+    try {
+        const res  = await fetch(`${API.booking}?code=${bookingCode}`);
+        const data = await res.json();
+        if (data.success) showReceipt(data.booking);
+    } catch (e) {}
+}
+
+// NAVIGATION & UTILITIES
+function showPage(pageId, el) {
+    document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(pageId)?.classList.remove('hidden');
+    if (el) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+    }
+    if (pageId === 'bookings-page') loadBookingHistory();
+    if (pageId === 'account-page')  fillAccountPage();
+}
+
+function fillAccountPage() {
+    if (!currentUserObj) return;
+    if (document.getElementById('acc-name'))  document.getElementById('acc-name').innerText  = currentUserObj.full_name;
+    if (document.getElementById('acc-ktp'))   document.getElementById('acc-ktp').innerText   = currentUserObj.ktp;
+    if (document.getElementById('acc-phone')) document.getElementById('acc-phone').innerText = currentUserObj.phone;
+}
+
+function unlockPassword() {
+    const input = document.getElementById('acc-pass');
+    if (input) { input.disabled = false; input.type = 'text'; input.value = ''; input.focus(); }
+}
+
+function toggleAuth(showLogin) {
+    document.getElementById('login-section').classList.toggle('hidden', !showLogin);
+    document.getElementById('signup-section').classList.toggle('hidden', showLogin);
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
