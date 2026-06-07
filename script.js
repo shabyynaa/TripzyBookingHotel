@@ -4,14 +4,13 @@ const API = {
     booking: 'api/booking.php',
 };
 
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 // ── STATE ──
 let currentUserObj = null;
 let pendingBooking = null;
 let allHotels      = [];
 
-// ════════════════════════════════════════
 // INIT
 function populateDropdowns() {
     const ids = ['count-room', 'count-adult', 'count-child'];
@@ -38,19 +37,19 @@ window.onload = async function () {
         return;
     }
 
-    // Cek apakah sudah login (session aktif)
-    try {
-        const res  = await fetch(`${API.auth}?action=me`);
-        const data = await res.json();
-        if (data.success) {
-            currentUserObj = data.user;
-            loginSuccessAction(currentUserObj);
-            return;
-        }
-    } catch (e) {}
+// Cek apakah sudah login (session aktif)
+try {
+    const res  = await fetch(`${API.auth}?action=me`);
+    const data = await res.json();
+    if (data.success) {
+        currentUserObj = data.user;
+        loginSuccessAction(currentUserObj);
+        return;
+    }
+} catch (e) {}
 
-    // Belum login — tampil auth page
-    document.getElementById('auth-page').style.display = 'flex';
+// Belum login — tampil auth page
+document.getElementById('auth-page').style.display = 'flex';
 };
 
 // AUTH — LOGIN
@@ -276,10 +275,31 @@ async function openRoomModal(hotelId) {
 
 // BOOKING
 function confirmBooking(hName, rType, price, roomId, hotelId) {
+    const checkin  = document.getElementById('checkin').value;
+    const checkout = document.getElementById('checkout').value;
+    
+    if (!checkin || !checkout) {
+        alert('Mohon isi tanggal check-in dan check-out terlebih dahulu!');
+        return;
+    }
+
+    // Hitung jumlah malam
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const nights   = Math.max(1, Math.round((new Date(checkout) - new Date(checkin)) / msPerDay));
+    const totalPrice = price * nights;
+
     const r = document.getElementById('count-room').value;
     const a = document.getElementById('count-adult').value;
     const c = document.getElementById('count-child').value;
-    pendingBooking = { hName, rType, price, roomId, hotelId, config: `${r} Room, ${a} Adult, ${c} Child`, roomCount: r, adultCount: a, childCount: c };
+
+    pendingBooking = { 
+        hName, rType, 
+        price: totalPrice,  // ← total sudah dikali malam
+        roomId, hotelId, 
+        config: `${r} Room, ${a} Adult, ${c} Child`, 
+        roomCount: r, adultCount: a, childCount: c,
+        nights  // ← simpan juga jumlah malamnya
+    };
     document.getElementById('book-for').value = 'self';
     toggleGuestFields();
     closeModal('room-modal');
@@ -309,8 +329,12 @@ function toggleGuestFields() {
 
 function proceedToPayment() {
     const name  = document.getElementById('guest-name').value;
-    const phone = document.getElementById('guest-phone').value;
-    if (!name || !phone) { alert('Lengkapi data tamu!'); return; }
+    const bookFor = document.getElementById('book-for').value;
+    const phone = bookFor == 'self'
+        ? currentUserObj.phone
+        : document.getElementById('guest-phone').value;
+
+    if (!name || !phone) { alert('Nama dan nomor telepon wajib diisi!'); return; }
 
     pendingBooking.guestName  = name;
     pendingBooking.guestPhone = phone;
@@ -345,6 +369,7 @@ async function processFinalPayment(method) {
             payment_method: method,
             special_req:    document.getElementById('guest-requests')?.value || '',
         };
+        console.log('payload:', payload);
 
         const res  = await fetch(API.booking, {
             method:  'POST',
@@ -409,7 +434,12 @@ function showReceipt(b) {
             <p><strong>Pembayaran:</strong> ${b.payment_method}</p>
             <hr style="margin:10px 0; opacity:0.2">
             <p style="font-size:1.1rem;"><strong>Total: Rp ${Number(b.total_price).toLocaleString()}</strong></p>
-        </div>`;
+        </div>
+        <a href="api/receipt.php?code=${b.booking_code}" target="_blank" 
+           class="btn-gradient" 
+           style="display:block; text-align:center; margin-top:16px; padding:12px; text-decoration:none;">
+            ⬇ Download Struk PDF
+        </a>`;
     document.getElementById('receipt-modal').style.display = 'flex';
 }
 
@@ -452,4 +482,9 @@ function toggleAuth(showLogin) {
 
 function closeModal(id) {
     document.getElementById(id).style.display = 'none';
+}
+
+async function signOutAction() {
+    await fetch(`${API.auth}?action=logout`, { method: 'POST' });
+    location.reload();
 }
