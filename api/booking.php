@@ -8,12 +8,24 @@ require '../config/db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ── GET BOOKING ──
 if ($method === 'GET') {
     $userId      = $_GET['user_id']  ?? null;
     $bookingCode = $_GET['code']     ?? null;
+    $all         = $_GET['all']      ?? null;
 
-    // Get satu booking by code
+    // Admin: lihat semua booking
+    if ($all && isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        $stmt = $pdo->query("
+            SELECT b.*, h.name as hotel_name, r.name as room_name
+            FROM bookings b
+            JOIN hotels h ON b.hotel_id = h.id
+            JOIN rooms r  ON b.room_id  = r.id
+            ORDER BY b.created_at DESC
+        ");
+        echo json_encode($stmt->fetchAll());
+        exit;
+    }
+
     if ($bookingCode) {
         $stmt = $pdo->prepare("
             SELECT b.*, h.name as hotel_name, r.name as room_name
@@ -24,15 +36,10 @@ if ($method === 'GET') {
         ");
         $stmt->execute([$bookingCode]);
         $booking = $stmt->fetch();
-        if ($booking) {
-            echo json_encode(['success' => true, 'booking' => $booking]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Booking tidak ditemukan']);
-        }
+        echo json_encode($booking ? ['success' => true, 'booking' => $booking] : ['success' => false, 'message' => 'Booking tidak ditemukan']);
         exit;
     }
 
-    // Get semua booking by user
     if ($userId) {
         $stmt = $pdo->prepare("
             SELECT b.*, h.name as hotel_name, r.name as room_name
@@ -47,19 +54,32 @@ if ($method === 'GET') {
         exit;
     }
 
+    // Booking milik user yang sedang login
+    if (isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare("
+            SELECT b.*, h.name as hotel_name, r.name as room_name
+            FROM bookings b
+            JOIN hotels h ON b.hotel_id = h.id
+            JOIN rooms r  ON b.room_id  = r.id
+            WHERE b.user_id = ?
+            ORDER BY b.created_at DESC
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+        echo json_encode($stmt->fetchAll());
+        exit;
+    }
+
     echo json_encode([]);
     exit;
 }
 
-// ── POST — BUAT BOOKING BARU ──
 if ($method === 'POST') {
     if (!isset($_SESSION['user_id'])) {
         echo json_encode(['success' => false, 'message' => 'Belum login']);
         exit;
     }
 
-    $data = json_decode(file_get_contents('php://input'), true);
-
+    $data          = json_decode(file_get_contents('php://input'), true);
     $hotelId       = $data['hotel_id']       ?? null;
     $roomId        = $data['room_id']         ?? null;
     $guestName     = $data['guest_name']      ?? '';
@@ -79,7 +99,6 @@ if ($method === 'POST') {
         exit;
     }
 
-    // Generate booking code unik
     $bookingCode = 'TRPZ-' . strtoupper(substr(uniqid(), -6));
 
     $stmt = $pdo->prepare("
@@ -97,7 +116,6 @@ if ($method === 'POST') {
         $paymentMethod, $specialReq
     ]);
 
-    // Ambil data booking lengkap untuk ditampilkan di receipt
     $stmt2 = $pdo->prepare("
         SELECT b.*, h.name as hotel_name, r.name as room_name
         FROM bookings b
@@ -106,9 +124,7 @@ if ($method === 'POST') {
         WHERE b.booking_code = ?
     ");
     $stmt2->execute([$bookingCode]);
-    $booking = $stmt2->fetch();
-
-    echo json_encode(['success' => true, 'booking' => $booking]);
+    echo json_encode(['success' => true, 'booking' => $stmt2->fetch()]);
     exit;
 }
 

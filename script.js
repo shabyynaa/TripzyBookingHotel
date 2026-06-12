@@ -115,10 +115,18 @@ async function signupAction() {
 
 // AFTER LOGIN SUCCESS
 async function loginSuccessAction(user) {
+    currentUserObj = user;
+
+    // Kalau admin, redirect ke halaman admin
+    if (user.role === 'admin') {
+        window.location.href = 'admin.php';
+        return;
+    }
+
     document.getElementById('auth-page').style.display  = 'none';
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('navbar').classList.remove('hidden');
-    document.getElementById('user-info').innerText = `Hi, ${user.full_name} ✦`;
+    document.getElementById('user-info').innerText = `Hi, ${user.full_name}`;
 
     if (document.getElementById('acc-name'))  document.getElementById('acc-name').innerText  = user.full_name;
     if (document.getElementById('acc-ktp'))   document.getElementById('acc-ktp').innerText   = user.ktp;
