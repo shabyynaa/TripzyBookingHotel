@@ -185,16 +185,33 @@
             </div>
 
 <!-- reviews -->
-            <div style="margin-bottom: 40px; background: var(--yellow-light); padding: 25px; border-radius: var(--radius);">
-                <h4 style="font-size: 1rem; margin-bottom: 5px; font-weight: 700;">What Guests Say</h4>
-                <p id="review-stats" style="font-size: 0.75rem; color: var(--pink); font-weight: 600; margin-bottom: 15px;"></p>
-                <div id="modal-hotel-reviews" style="display: flex; flex-direction: column; gap: 15px;"></div>
-            </div>
+    <div style="margin-bottom: 40px; background: var(--yellow-light); padding: 25px; border-radius: var(--radius);">
+        <h4 style="font-size: 1rem; margin-bottom: 5px; font-weight: 700;">What Guests Say</h4>
+        <p id="review-stats" style="font-size: 0.75rem; color: var(--pink); font-weight: 600; margin-bottom: 15px;"></p>
+        <div id="modal-hotel-reviews" style="display: flex; flex-direction: column; gap: 15px;"></div>
 
+        <!-- Form tulis review -->
+        <div id="review-form-section" style="margin-top: 20px; border-top: 2px solid var(--pink-light); padding-top: 20px; display:none;">
+            <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;">Write a Review</h4>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 0.85rem; font-weight: 600;">Rating:</span>
+                <select id="review-rating" style="border: 1px solid var(--pink-light); border-radius: 8px; padding: 2px 8px;">
+                    <option value="5">⭐⭐⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="1">⭐</option>
+                </select>
+            </div>
+            <textarea id="review-comment" rows="3" placeholder="Share your experience..." style="width:100%; border-radius: 10px; border: 1px solid var(--pink-light); padding: 10px; font-family: inherit; resize: vertical; margin-bottom: 12px;"></textarea>
+            <button class="btn-gradient" onclick="submitReview()" style="padding: 10px 24px;">Submit Review</button>
+            <br><br>
             <h4 style="font-size: 1.2rem; margin-bottom: 15px; font-weight: 800; border-bottom: 2px solid var(--yellow-light); padding-bottom: 10px;">Available Rooms</h4>
             <div id="room-grid" class="room-selection-grid"></div>
         </div>
     </div>
+
+<!-- confirmation form modal -->
 
 <!-- confirmation form modal -->
     <div id="confirm-form-modal" class="modal">

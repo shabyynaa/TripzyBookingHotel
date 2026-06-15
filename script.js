@@ -2,14 +2,16 @@ const API = {
     hotels:  'api/hotel.php',
     auth:    'api/auth.php',
     booking: 'api/booking.php',
+    review:  'api/review.php',
 };
 
 const DEV_MODE = false;
 
 // ── STATE ──
-let currentUserObj = null;
-let pendingBooking = null;
-let allHotels      = [];
+let currentUserObj  = null;
+let pendingBooking  = null;
+let allHotels       = [];
+let currentHotelId  = null;
 
 // INIT
 function populateDropdowns() {
@@ -218,6 +220,7 @@ function renderRecommendations() {
 
 // OPEN ROOM MODAL
 async function openRoomModal(hotelId) {
+    currentHotelId = hotelId;
     try {
         const res   = await fetch(`${API.hotels}?id=${hotelId}`);
         const hotel = await res.json();
@@ -274,6 +277,8 @@ async function openRoomModal(hotelId) {
             }).join('')
             : '<p style="color:#aaa;">Tidak ada kamar tersedia.</p>';
 
+        await loadHotelReviews(hotelId);
+        document.getElementById('review-form-section').style.display = 'block';
         document.getElementById('room-modal').style.display = 'flex';
     } catch (e) {
         console.error('Gagal load detail hotel:', e);
@@ -310,8 +315,8 @@ function confirmBooking(hName, rType, price, roomId, hotelId) {
     };
     document.getElementById('book-for').value = 'self';
     toggleGuestFields();
-    closeModal('room-modal');
-    document.getElementById('confirm-form-modal').style.display = 'flex';
+document.getElementById('confirm-form-modal').style.display = 'flex';
+document.getElementById('room-modal').style.display = 'none';
 }
 
 function toggleGuestFields() {
@@ -450,6 +455,60 @@ function showReceipt(b) {
         </a>`;
     document.getElementById('receipt-modal').style.display = 'flex';
 }
+
+// LOAD REVIEWS
+async function loadHotelReviews(hotelId) {
+    try {
+        const res  = await fetch(`${API.review}?hotel_id=${hotelId}`);
+        const data = await res.json();
+        const container = document.getElementById('modal-hotel-reviews');
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p style="color:#999; font-style:italic;">Belum ada review.</p>';
+            return;
+        }
+        container.innerHTML = data.map(r => `
+            <div style="background:white; padding:15px; border-radius:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <strong style="font-size:0.9rem;">${r.reviewer || r.user_name || 'Anonymous'}</strong>
+                    <span style="color:var(--yellow); font-size:0.85rem;">${'⭐'.repeat(r.rating)}</span>
+                </div>
+                <p style="font-size:0.85rem; color:#555; margin:0;">${r.comment}</p>
+            </div>`).join('');
+    } catch(e) {
+        console.error('Gagal load reviews:', e);
+    }
+}
+
+// SUBMIT REVIEW
+async function submitReview() {
+    const rating  = document.getElementById('review-rating').value;
+    const comment = document.getElementById('review-comment').value.trim();
+
+    if (!comment) {
+        alert('Tulis dulu reviewnya!');
+        return;
+    }
+
+    try {
+        const res  = await fetch(API.review, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ hotel_id: currentHotelId, rating, comment }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('Review berhasil dikirim! 🙏');
+            document.getElementById('review-comment').value = '';
+            loadHotelReviews(currentHotelId);
+        } else {
+            alert(data.message || 'Gagal kirim review');
+        }
+    } catch(e) {
+        alert('Terjadi kesalahan, coba lagi.');
+    }
+}
+
 
 async function showReceiptById(bookingCode) {
     try {

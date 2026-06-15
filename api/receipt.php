@@ -133,7 +133,12 @@ foreach ($keys as $key) {
     $pdf->SetX(130);
 }
 
-$pdf->Ln(4);
+$yAfterLeft  = $pdf->GetY();
+$yAfterRight = $yStart + (count($rightInfo) * 7);
+$pdf->SetY(max($yAfterLeft, $yAfterRight));
+$pdf->Ln(6);
+
+// ── TABEL ITEM ──
 
 // ── TABEL ITEM ──
 // Header tabel
