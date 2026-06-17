@@ -1,8 +1,8 @@
 <?php
-$host     = 'localhost';
-$dbname   = 'fp_pweb_bookinghotel';
-$username = 'root';
-$password = '';
+$host     = 'sql103.infinityfree.com'; // cek di cPanel kamu
+$dbname   = 'if0_42189740_fp_pweb_bookinghotel'; // nama DB dari cPanel
+$username = 'if0_42189740'; // username dari cPanel
+$password = 'Gk4NeJYLOtSvBY';
 
 try {
     $pdo = new PDO(
